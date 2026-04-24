@@ -1,11 +1,12 @@
 import { ref, computed, type Ref } from 'vue'
 
-export function useSort<T>(
+// Added constraint: T must be an object
+export function useSort<T extends Record<string, any>>(
   data: Ref<T[]>,
   initialKey: keyof T,
   initialOrder: 'asc' | 'desc' = 'asc'
 ) {
-  const sortKey = ref(initialKey)
+  const sortKey = ref(initialKey) as Ref<keyof T>
   const sortOrder = ref(initialOrder)
 
   const sortedData = computed(() => {

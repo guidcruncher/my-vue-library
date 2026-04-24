@@ -55,7 +55,7 @@ export function useLogger(namespace: string = 'App') {
       debug: '#7f8c8d', // Grey
       info: '#2ecc71', // Green
       warn: '#f1c40f', // Yellow
-      errohr: '#e74c3c', // Red
+      error: '#e74c3c', // Red
     }
 
     // Console Output with Styling

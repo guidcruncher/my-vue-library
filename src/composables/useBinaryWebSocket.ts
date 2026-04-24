@@ -6,7 +6,7 @@ export interface UseBinaryWebSocketReturn {
   data: Ref<BinaryData | null>
   status: Ref<'OPEN' | 'CLOSED' | 'CONNECTING' | 'ERROR'>
   error: Ref<Event | null>
-  send: (payload: BinaryData | string | ArrayBufferView) => void
+  send: (payload: string | Blob | BufferSource) => void
   close: (code?: number, reason?: string) => void
   connect: () => void
 }
@@ -53,7 +53,7 @@ export function useBinaryWebSocket(
     }
   }
 
-  const send = (payload: BinaryData | string | ArrayBufferView) => {
+  const send = (payload: string | Blob | BufferSource) => {
     if (socket?.readyState === WebSocket.OPEN) {
       socket.send(payload)
     }

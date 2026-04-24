@@ -1,4 +1,4 @@
-import { ref, Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 export function useOptimisticMutation<T>(state: Ref<T>) {
   const isSyncing = ref(false)
@@ -11,7 +11,7 @@ export function useOptimisticMutation<T>(state: Ref<T>) {
     try {
       await mutationFn(newValue)
     } catch (e) {
-      state.value = previousValue // Rollback on failure
+      state.value = previousValue
       console.error('Mutation failed, rolling back.', e)
     } finally {
       isSyncing.value = false

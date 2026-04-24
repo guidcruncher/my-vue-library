@@ -190,7 +190,40 @@ const isIdle = useIdle(60000); // 1 minute
 Tracks browser permissions like 'camera' or 'notifications'.
 
 ```
-const status = usePermission('notifications');
+<script setup>
+import { computed } from 'vue';
+import { usePermission } from './composables/usePermission';
+
+const permissionName = ref('notifications');
+const status = usePermission(permissionName);
+
+const statusColor = computed(() => {
+  return {
+    granted: 'text-green-600',
+    denied: 'text-red-600',
+    prompt: 'text-yellow-600'
+  }[status.value] || 'text-gray-400';
+});
+</script>
+
+<template>
+  <div class="p-4 border rounded-lg">
+    <h3 class="font-bold">Permission Tracker</h3>
+
+    <select v-model="permissionName" class="mt-2 border rounded p-1">
+      <option value="notifications">Notifications</option>
+      <option value="camera">Camera</option>
+      <option value="geolocation">Geolocation</option>
+    </select>
+
+    <p class="mt-4">
+      Status for <span class="font-mono">{{ permissionName }}</span>:
+      <span :class="statusColor" class="font-bold uppercase">
+        {{ status }}
+      </span>
+    </p>
+  </div>
+</template>
 ```
 
 ### useGeolocation
@@ -317,4 +350,119 @@ Slices an array into reactive pages.
 
 ```
 const { paginatedData, next, prev } = usePagination(items, 10);
+```
+
+### useNotification
+
+Uses the browser Notification API if available and permitted.
+
+```
+<script setup>
+import { useNotification } from './composables/useNotification';
+
+const {
+  isSupported,
+  permission,
+  requestPermission,
+  showNotification
+} = useNotification();
+
+const notifyUser = async () => {
+  if (permission.value === 'default') {
+    await requestPermission();
+  }
+
+  if (permission.value === 'granted') {
+    showNotification({
+      title: 'New Message',
+      body: 'You have received a new document in your inbox.',
+      icon: '/vite.svg'
+    });
+  }
+};
+</script>
+
+<template>
+  <div class="p-6">
+    <h1 class="text-xl font-bold">Notification Controller</h1>
+
+    <div class="mt-4 space-y-4">
+      <p>Browser Support: {{ isSupported ? 'YES' : 'NO' }}</p>
+      <p>Permission Status: <span class="font-mono">{{ permission }}</span></p>
+
+      <button
+        v-if="permission === 'default'"
+        @click="requestPermission"
+        class="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Enable Notifications
+      </button>
+
+      <button
+        @click="notifyUser"
+        class="bg-green-500 text-white px-4 py-2 rounded"
+      >
+        Send Test Notification
+      </button>
+    </div>
+  </div>
+</template>
+```
+
+### useCamera
+
+Connect to the computer Camera if available and permitted
+
+```
+<script setup>
+import { ref, watch } from 'vue';
+import { useCamera } from './composables/useCamera';
+
+const videoElement = ref(null);
+const { stream, error, isPending, isActive, start, stop } = useCamera();
+
+// When the stream becomes available, attach it to the video tag
+watch(stream, (newStream) => {
+  if (videoElement.value && newStream) {
+    videoElement.value.srcObject = newStream;
+  }
+});
+</script>
+
+<template>
+  <div class="camera-container">
+    <div v-if="error" class="error-msg">
+      Error: {{ error.message }}
+    </div>
+
+    <video
+      ref="videoElement"
+      autoplay
+      playsinline
+      class="video-preview"
+      :class="{ 'is-active': isActive }"
+    ></video>
+
+    <div class="controls">
+      <button v-if="!isActive" @click="start()" :disabled="isPending">
+        {{ isPending ? 'Accessing Camera...' : 'Open Camera' }}
+      </button>
+
+      <button v-else @click="stop" class="btn-stop">
+        Close Camera
+      </button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.video-preview {
+  width: 100%;
+  max-width: 640px;
+  background: #000;
+  border-radius: 8px;
+}
+.error-msg { color: red; margin-bottom: 1rem; }
+.controls { margin-top: 1rem; }
+</style>
 ```

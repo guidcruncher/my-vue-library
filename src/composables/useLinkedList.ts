@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue'
+import { shallowRef, computed } from 'vue'
 
 interface ListNode<T> {
   value: T
@@ -6,8 +6,8 @@ interface ListNode<T> {
 }
 
 export function useLinkedList<T>() {
-  const head = ref<ListNode<T> | null>(null)
-  const size = ref(0)
+  const head = shallowRef<ListNode<T> | null>(null)
+  const size = shallowRef(0)
 
   const isEmpty = computed(() => size.value === 0)
 

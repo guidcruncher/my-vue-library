@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue'
+import { shallowRef, computed } from 'vue'
 
 interface PriorityItem<T> {
   value: T
@@ -6,7 +6,7 @@ interface PriorityItem<T> {
 }
 
 export function usePriorityQueue<T>() {
-  const items = ref<PriorityItem<T>[]>([])
+  const items = shallowRef<PriorityItem<T>[]>([])
 
   const isEmpty = computed(() => items.value.length === 0)
 
