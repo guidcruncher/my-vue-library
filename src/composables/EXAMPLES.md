@@ -466,3 +466,57 @@ watch(stream, (newStream) => {
 .controls { margin-top: 1rem; }
 </style>
 ```
+
+### useDragDrop
+
+​In this example, we use the composable to move items from a "List" into a "Bin".
+
+```
+<script setup>
+import { ref } from 'vue';
+import { useDragDrop } from './composables/useDragDrop';
+
+const items = ref([
+  { id: 1, name: 'Finish Report' },
+  { id: 2, name: 'Email Team' },
+  { id: 3, name: 'Debug Composable' }
+]);
+
+const bin = ref([]);
+
+const { isDragging, isOver, draggableProps, droppableProps } = useDragDrop();
+
+const handleDrop = (data) => {
+  // Remove from items and add to bin
+  items.value = items.value.filter(i => i.id !== data.id);
+  bin.value.push(data);
+};
+</script>
+
+<template>
+  <div class="flex gap-8 p-10">
+    <div class="flex-1 border p-4 rounded bg-gray-50">
+      <h2 class="font-bold mb-4">Tasks</h2>
+      <div
+        v-for="item in items"
+        :key="item.id"
+        v-bind="draggableProps(item)"
+        class="p-3 mb-2 bg-white border rounded cursor-move shadow-sm hover:border-blue-500"
+      >
+        {{ item.name }}
+      </div>
+    </div>
+
+    <div
+      v-bind="droppableProps(handleDrop)"
+      class="flex-1 border-2 border-dashed p-4 rounded transition-colors"
+      :class="isOver ? 'bg-blue-100 border-blue-500' : 'bg-gray-50 border-gray-300'"
+    >
+      <h2 class="font-bold mb-4">Complete (Drop Here)</h2>
+      <div v-for="item in bin" :key="item.id" class="p-2 text-gray-500">
+        ✓ {{ item.name }}
+      </div>
+    </div>
+  </div>
+</template>
+```
