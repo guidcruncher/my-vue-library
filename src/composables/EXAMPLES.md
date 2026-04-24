@@ -1,23 +1,3 @@
-# Composable API
-
-33 Utilities Reference
-
-## Hardware & UI
-
-[useBattery](#battery) [useVibrate](#vibrate) [useDeviceOrientation](#orientation) [useInfiniteScroll](#infinite-scroll) [useElementSize](#element-size) [useLogger](#logger) [useEventBus](#event-bus) [useCircularRingBuffer](#ring-buffer) [useIndexedDB](#indexeddb) [useScript](#script)
-
-## Data & Sensors
-
-[useStack](#stack) [useQueue](#queue) [usePriorityQueue](#p-queue) [useLinkedList](#linked-list) [useHistory](#history) [useSort](#sort) [useIdle](#idle) [usePermission](#permission) [useGeolocation](#geolocation)
-
-## Network & Storage
-
-[useFetch](#fetch) [useJsonWebSocket](#json-ws) [useStorage](#storage) [useCookie](#cookie) [useDebounce](#debounce) [useThrottleRef](#throttle) [useClickOutside](#click-outside) [useMediaQuery](#media-query) [useOnlineStatus](#online) [usePolling](#polling)
-
-## Advanced Logic
-
-[useOptimisticMutation](#optimistic) [useExponentialBackoff](#backoff) [useBinaryWebSocket](#binary-ws) [usePagination](#pagination)
-
 # Composables Library
 
 A collection of reusable Vue 3 logic for hardware APIs, data structures, and network patterns.

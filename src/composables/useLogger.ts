@@ -1,16 +1,16 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 export interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  namespace: string;
-  message: string;
-  payload?: any;
+  timestamp: string
+  level: LogLevel
+  namespace: string
+  message: string
+  payload?: any
 }
 
-export type LogHandler = (entry: LogEntry) => void | Promise<void>;
+export type LogHandler = (entry: LogEntry) => void | Promise<void>
 
 export interface LogConfig {
   enabled: boolean
@@ -21,18 +21,17 @@ export interface LogConfig {
 const LOG_CONFIG = ref<LogConfig>({
   enabled: true,
   minLevel: 'debug',
-});
+})
 
 const LEVEL_WEIGHTS: Record<LogLevel, number> = {
-  debug: 0, 
+  debug: 0,
   info: 1,
   warn: 2,
-  error: 3
-};
-
+  error: 3,
+}
 
 export function register(newConfig: Partial<LogConfig>) {
-    LOG_CONFIG.value = { ...LOG_CONFIG.value, ...newConfig };
+  LOG_CONFIG.value = { ...LOG_CONFIG.value, ...newConfig }
 }
 
 /**
@@ -40,25 +39,24 @@ export function register(newConfig: Partial<LogConfig>) {
  * @param namespace - Group logs by feature (e.g., "Auth", "Socket")
  */
 export function useLogger(namespace: string = 'App') {
-  
   const log = (level: LogLevel, message: string, payload?: any) => {
-    if (!LOG_CONFIG.value.enabled) return;
-    if (LEVEL_WEIGHTS[level] < LEVEL_WEIGHTS[LOG_CONFIG.value.minLevel]) return;
+    if (!LOG_CONFIG.value.enabled) return
+    if (LEVEL_WEIGHTS[level] < LEVEL_WEIGHTS[LOG_CONFIG.value.minLevel]) return
 
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
       namespace,
       message,
-      payload
-    };
+      payload,
+    }
 
     const colorMap: Record<LogLevel, string> = {
       debug: '#7f8c8d', // Grey
-      info: '#2ecc71',  // Green
-      warn: '#f1c40f',  // Yellow
-      errohr: '#e74c3c'  // Red
-    };
+      info: '#2ecc71', // Green
+      warn: '#f1c40f', // Yellow
+      errohr: '#e74c3c', // Red
+    }
 
     // Console Output with Styling
     console.log(
@@ -67,17 +65,17 @@ export function useLogger(namespace: string = 'App') {
       `color: #fff; background: ${colorMap[level]}; padding: 2px 4px; border-radius: 3px;`,
       'color: inherit; font-weight: normal;',
       payload ?? ''
-    );
+    )
 
     if (LOG_CONFIG.value.transport) {
-      LOG_CONFIG.value.transport(entry);
+      LOG_CONFIG.value.transport(entry)
     }
-  };
+  }
 
   return {
     debug: (msg: string, data?: any) => log('debug', msg, data),
     info: (msg: string, data?: any) => log('info', msg, data),
     warn: (msg: string, data?: any) => log('warn', msg, data),
-    error: (msg: string, data?: any) => log('error', msg, data)
-  };
+    error: (msg: string, data?: any) => log('error', msg, data),
+  }
 }

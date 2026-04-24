@@ -101,12 +101,12 @@ log.info('User logged in');
 
 Optimization utilities and UI sensor wrappers.
 
-| Composable | Use Case |
-| --- | --- |
-| `useDebounce` | Delay updates until activity stops (Search bars). |
-| `useThrottleRef` | Limit update frequency (Scroll/Resize). |
-| `useClickOutside` | Close dropdowns/modals when clicking away. |
-| `useIdle` | Detect user inactivity for security or power saving. |
+| Composable        | Use Case                                             |
+| ----------------- | ---------------------------------------------------- |
+| `useDebounce`     | Delay updates until activity stops (Search bars).    |
+| `useThrottleRef`  | Limit update frequency (Scroll/Resize).              |
+| `useClickOutside` | Close dropdowns/modals when clicking away.           |
+| `useIdle`         | Detect user inactivity for security or power saving. |
 
 ## 6\. Hardware & Browser APIs
 
