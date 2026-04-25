@@ -520,3 +520,14 @@ const handleDrop = (data) => {
   </div>
 </template>
 ```
+
+### useTimer
+
+```
+const timer = useTimer({
+  intervalMs: 1000,
+  onTick: (elapsed) => {
+    console.log('Timer ticked at', elapsed, 'ms')
+  }
+})
+```
