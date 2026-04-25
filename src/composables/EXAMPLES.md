@@ -241,7 +241,7 @@ const { coords, error } = useGeolocation();
 Clean Fetch API wrapper with loading and error states.
 
 ```
-const { data, isPending, execute } = useFetch('/api/user');
+const { data, error, isPending } = useFetch('/api/user');
 ```
 
 ### useJsonWebSocket
@@ -531,3 +531,38 @@ const timer = useTimer({
   }
 })
 ```
+
+### useRestClient
+
+```
+const api = useRestClient({
+  baseUrl: 'https://api.example.com',
+  headers: {
+    Authorization: 'Bearer token'
+  }
+})
+
+const { data, ok } = await api.get<User[]>('/users')
+
+await api.get<User[]>('/users', {
+  params: { limit: 10, active: true }
+})
+
+await api.post<User, CreateUserPayload>('/users', {
+  name: 'John',
+  email: 'john@example.com'
+})
+
+const userId = ref('123')
+
+const { data } = await api.get<User>(computed(() => `/users/${userId.value}`))
+
+const controller = new AbortController()
+
+api.get('/slow', { signal: controller.signal })
+controller.abort()
+
+```
+
+
+
