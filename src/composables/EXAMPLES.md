@@ -668,3 +668,37 @@ const {
   </div>
 </template>
 ```
+
+### useTrpc
+
+```
+<template>
+  <div>
+    <h1>tRPC Vue Client</h1>
+    
+    <div v-if="isLoading">Loading user...</div>
+    
+    <div v-else-if="user">
+      <p>Name: {{ user.name }}</p>
+      <p>Email: {{ user.email }}</p>
+    </div>
+
+    <button @click="fetchUser" :disabled="isLoading">Reload User</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useTrpc } from '@/composables/useTrpc';
+
+const { client, isLoading, query } = useTrpc();
+const user = ref(null);
+
+const fetchUser = async () => {
+  // query() provides the loading state management
+  user.value = await query((t) => t.user.getById.query({ id: '42' }));
+};
+
+onMounted(fetchUser);
+</script>
+```
