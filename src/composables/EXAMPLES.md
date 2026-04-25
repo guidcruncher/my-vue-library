@@ -620,3 +620,51 @@ rpc.onNotification('userUpdated', (payload) => {
 });
 </script>
 ```
+
+### useGeoLocationByIP
+
+```
+<script setup lang="ts">
+import { useGeoLocationByIP } from '@/composables/useGeoLocationByIP';
+
+const {
+  location,
+  loading,
+  error,
+  isOnline,
+  refresh
+} = useGeoLocationByIP();
+</script>
+
+<template>
+  <div class="p-4 space-y-4">
+    <div>
+      <strong>Network:</strong>
+      <span :class="isOnline ? 'text-green-600' : 'text-red-600'">
+        {{ isOnline ? 'Online' : 'Offline' }}
+      </span>
+    </div>
+
+    <div v-if="loading">Fetching location…</div>
+    <div v-if="error" class="text-red-600">Error: {{ error }}</div>
+
+    <div v-if="location" class="space-y-1">
+      <div><strong>IP:</strong> {{ location.ip }}</div>
+      <div><strong>City:</strong> {{ location.city }}</div>
+      <div><strong>Region:</strong> {{ location.region }}</div>
+      <div><strong>Country:</strong> {{ location.country }}</div>
+      <div><strong>Continent:</strong> {{ location.continent }}</div>
+      <div><strong>Latitude:</strong> {{ location.latitude }}</div>
+      <div><strong>Longitude:</strong> {{ location.longitude }}</div>
+      <div><strong>Timezone:</strong> {{ location.timezone }}</div>
+    </div>
+
+    <button
+      @click="refresh"
+      class="px-3 py-1 bg-blue-600 text-white rounded"
+    >
+      Refresh
+    </button>
+  </div>
+</template>
+```
