@@ -601,3 +601,22 @@ api.addResponseInterceptor((res) => {
   return res
 })
 ```
+
+### useJsonRpcClient
+
+```
+<script setup lang="ts">
+import { useJsonRpcClient } from '@/composables/useJsonRpcClient';
+
+const rpc = useJsonRpcClient('ws://localhost:9000/ws');
+
+async function loadUser() {
+  const user = await rpc.call('getUser', { id: 123 });
+  console.log('User:', user);
+}
+
+rpc.onNotification('userUpdated', (payload) => {
+  console.log('User updated:', payload);
+});
+</script>
+```
