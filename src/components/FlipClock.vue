@@ -1,84 +1,84 @@
 <template>
-    <div class="clock-container" style="width:240px;height:auto">
-      <div class="clock-card surface">
-        <div class="time-display">
-          <FlipCard
-            :value="hours[0]"
-            :prev-value="prevHours[0]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
-          <FlipCard
-            :value="hours[1]"
-            :prev-value="prevHours[1]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
+  <div class="clock-container" style="width: 240px; height: auto">
+    <div class="clock-card surface">
+      <div class="time-display">
+        <FlipCard
+          :value="hours[0]"
+          :prev-value="prevHours[0]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
+        <FlipCard
+          :value="hours[1]"
+          :prev-value="prevHours[1]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
 
-          <div class="colon">
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-
-          <FlipCard
-            :value="minutes[0]"
-            :prev-value="prevMinutes[0]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
-          <FlipCard
-            :value="minutes[1]"
-            :prev-value="prevMinutes[1]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
-
-          <div v-if="showSeconds" class="colon">
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-
-          <FlipCard
-            v-if="showSeconds"
-            :value="seconds[0]"
-            :prev-value="prevSeconds[0]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
-          <FlipCard
-            v-if="showSeconds"
-            :value="seconds[1]"
-            :prev-value="prevSeconds[1]"
-            :card-width="cardWidth"
-            :card-height="cardHeight"
-            :font-size="fontSize"
-            :text-offset-y="textOffsetY"
-            :center-line-height="centerLineHeight"
-            :margin="margin"
-          />
+        <div class="colon">
+          <div class="dot"></div>
+          <div class="dot"></div>
         </div>
+
+        <FlipCard
+          :value="minutes[0]"
+          :prev-value="prevMinutes[0]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
+        <FlipCard
+          :value="minutes[1]"
+          :prev-value="prevMinutes[1]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
+
+        <div v-if="showSeconds" class="colon">
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+
+        <FlipCard
+          v-if="showSeconds"
+          :value="seconds[0]"
+          :prev-value="prevSeconds[0]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
+        <FlipCard
+          v-if="showSeconds"
+          :value="seconds[1]"
+          :prev-value="prevSeconds[1]"
+          :card-width="cardWidth"
+          :card-height="cardHeight"
+          :font-size="fontSize"
+          :text-offset-y="textOffsetY"
+          :center-line-height="centerLineHeight"
+          :margin="margin"
+        />
       </div>
     </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -118,7 +118,7 @@ const tzDate = () => {
 
 const time = ref(tzDate())
 const prevTime = ref(tzDate())
-let timer = null
+let timer: any = null
 
 onMounted(() => {
   timer = setInterval(() => {
@@ -132,7 +132,7 @@ onMounted(() => {
 
 onUnmounted(() => clearInterval(timer))
 
-const formatNumber = (n) => String(n).padStart(2, '0')
+const formatNumber = (n: any) => String(n).padStart(2, '0')
 
 const hours = computed(() => formatNumber(time.value.getHours()))
 const minutes = computed(() => formatNumber(time.value.getMinutes()))

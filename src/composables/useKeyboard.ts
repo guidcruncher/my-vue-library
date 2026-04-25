@@ -1,7 +1,9 @@
 import { onMounted, onUnmounted } from 'vue'
 
-export function useEscapeKey(handler, key, isActive = true) {
-  const handleKeydown = (event) => {
+export type KeyHandler = () => void | Promise<void>
+
+export function useKeyboard(handler: KeyHandler, key: any, isActive = true) {
+  const handleKeydown = (event: any) => {
     if (isActive && event.key === key) {
       event.preventDefault()
       handler()

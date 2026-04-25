@@ -1,108 +1,108 @@
 <template>
-    <div class="analog-clock-wrapper">
-      <div class="analog-clock" :style="clockPanelStyle">
-        <svg :width="size" :height="size" viewBox="0 0 100 100">
-          <circle
-            cx="50"
-            cy="50"
-            r="50"
-            :fill="faceColor || 'var(--surface-bg)'"
-            :stroke="borderColor || 'var(--surface-border)'"
-            stroke-width="1"
-          />
+  <div class="analog-clock-wrapper">
+    <div class="analog-clock" :style="clockPanelStyle">
+      <svg :width="size" :height="size" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="50"
+          :fill="faceColor || 'var(--surface-bg)'"
+          :stroke="borderColor || 'var(--surface-border)'"
+          stroke-width="1"
+        />
 
-          <g class="minute-markers">
-            <line
-              v-for="m in 60"
-              :key="m"
-              x1="50"
-              y1="2"
-              x2="50"
-              y2="4"
-              :stroke="markerColor || 'var(--text-tertiary)'"
-              stroke-width="0.5"
-              :transform="`rotate(${m * 6} 50 50)`"
-            />
-          </g>
-
-          <g class="hour-markers">
-            <line
-              v-for="h in 12"
-              :key="h"
-              x1="50"
-              y1="2"
-              x2="50"
-              y2="7"
-              :stroke="markerColor || 'var(--text-secondary)'"
-              stroke-width="1.5"
-              :transform="`rotate(${(h * 30) % 360} 50 50)`"
-            />
-          </g>
-
-          <g class="hour-numbers">
-            <text
-              v-for="h in 12"
-              :key="h"
-              :x="50 + 40 * Math.sin((h * 30 * Math.PI) / 180)"
-              :y="50 - 40 * Math.cos((h * 30 * Math.PI) / 180) + 1.5"
-              text-anchor="middle"
-              alignment-baseline="middle"
-              font-size="8"
-              font-weight="bold"
-              :fill="markerColor || 'var(--text-color)'"
-              style="font-family: var(--font-family)"
-            >
-              {{ h }}
-            </text>
-          </g>
-
+        <g class="minute-markers">
           <line
-            class="hour-hand"
+            v-for="m in 60"
+            :key="m"
             x1="50"
-            y1="55"
+            y1="2"
             x2="50"
-            y2="28"
-            :stroke="hourHandColor || 'var(--text-color)'"
-            stroke-width="3"
-            stroke-linecap="round"
-            :transform="`rotate(${hourAngle} 50 50)`"
-          />
-
-          <line
-            class="minute-hand"
-            x1="50"
-            y1="55"
-            x2="50"
-            y2="15"
-            :stroke="minuteHandColor || 'var(--text-color)'"
-            stroke-width="2"
-            stroke-linecap="round"
-            :transform="`rotate(${minuteAngle} 50 50)`"
-          />
-
-          <line
-            class="second-hand"
-            x1="50"
-            y1="55"
-            x2="50"
-            y2="10"
-            :stroke="secondHandColor || 'var(--sys-danger)'"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            :transform="`rotate(${secondAngle} 50 50)`"
-          />
-
-          <circle
-            cx="50"
-            cy="50"
-            r="2.5"
-            fill="var(--text-color)"
-            stroke="var(--surface-bg)"
+            y2="4"
+            :stroke="markerColor || 'var(--text-tertiary)'"
             stroke-width="0.5"
+            :transform="`rotate(${m * 6} 50 50)`"
           />
-        </svg>
-      </div>
+        </g>
+
+        <g class="hour-markers">
+          <line
+            v-for="h in 12"
+            :key="h"
+            x1="50"
+            y1="2"
+            x2="50"
+            y2="7"
+            :stroke="markerColor || 'var(--text-secondary)'"
+            stroke-width="1.5"
+            :transform="`rotate(${(h * 30) % 360} 50 50)`"
+          />
+        </g>
+
+        <g class="hour-numbers">
+          <text
+            v-for="h in 12"
+            :key="h"
+            :x="50 + 40 * Math.sin((h * 30 * Math.PI) / 180)"
+            :y="50 - 40 * Math.cos((h * 30 * Math.PI) / 180) + 1.5"
+            text-anchor="middle"
+            alignment-baseline="middle"
+            font-size="8"
+            font-weight="bold"
+            :fill="markerColor || 'var(--text-color)'"
+            style="font-family: var(--font-family)"
+          >
+            {{ h }}
+          </text>
+        </g>
+
+        <line
+          class="hour-hand"
+          x1="50"
+          y1="55"
+          x2="50"
+          y2="28"
+          :stroke="hourHandColor || 'var(--text-color)'"
+          stroke-width="3"
+          stroke-linecap="round"
+          :transform="`rotate(${hourAngle} 50 50)`"
+        />
+
+        <line
+          class="minute-hand"
+          x1="50"
+          y1="55"
+          x2="50"
+          y2="15"
+          :stroke="minuteHandColor || 'var(--text-color)'"
+          stroke-width="2"
+          stroke-linecap="round"
+          :transform="`rotate(${minuteAngle} 50 50)`"
+        />
+
+        <line
+          class="second-hand"
+          x1="50"
+          y1="55"
+          x2="50"
+          y2="10"
+          :stroke="secondHandColor || 'var(--sys-danger)'"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          :transform="`rotate(${secondAngle} 50 50)`"
+        />
+
+        <circle
+          cx="50"
+          cy="50"
+          r="2.5"
+          fill="var(--text-color)"
+          stroke="var(--surface-bg)"
+          stroke-width="0.5"
+        />
+      </svg>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -151,7 +151,7 @@ const fractionalSecond = computed(() => second.value + milliseconds.value / 1000
 const secondAngle = computed(() => (props.glide ? fractionalSecond.value * 6 : second.value * 6))
 const minuteAngle = computed(() => minute.value * 6 + fractionalSecond.value * 0.1)
 const hourAngle = computed(
-  () => (hour.value % 12) * 30 + minute.value * 0.5 + fractionalSecond.value * (0.5 / 60),
+  () => (hour.value % 12) * 30 + minute.value * 0.5 + fractionalSecond.value * (0.5 / 60)
 )
 
 const clockPanelStyle = computed(() => ({
