@@ -562,7 +562,42 @@ const controller = new AbortController()
 api.get('/slow', { signal: controller.signal })
 controller.abort()
 
+// With interceptors
+
+api.addRequestInterceptor(({ method, path, options }) => {
+  return {
+    method,
+    path,
+    options: {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token.value}`
+      }
+    }
+  }
+})
+
+api.addResponseInterceptor((res) => {
+  if (!res.ok && res.data && typeof res.data === 'object') {
+    return {
+      ...res,
+      data: {
+        error: true,
+        message: (res.data as any).message ?? 'Unknown error'
+      }
+    }
+  }
+  return res
+})
+
+api.addResponseInterceptor((res) => {
+  if (res.data && Array.isArray(res.data)) {
+    return {
+      ...res,
+      data: res.data.map(x => ({ ...x, id: String(x.id) }))
+    }
+  }
+  return res
+})
 ```
-
-
-
