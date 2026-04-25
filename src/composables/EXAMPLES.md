@@ -660,7 +660,7 @@ const {
     </div>
 
     <button
-      @click="refresh"
+     @click="refresh"
       class="px-3 py-1 bg-blue-600 text-white rounded"
     >
       Refresh
@@ -669,36 +669,35 @@ const {
 </template>
 ```
 
-### useTrpc
+### useDateTime
 
 ```
-<template>
-  <div>
-    <h1>tRPC Vue Client</h1>
-    
-    <div v-if="isLoading">Loading user...</div>
-    
-    <div v-else-if="user">
-      <p>Name: {{ user.name }}</p>
-      <p>Email: {{ user.email }}</p>
-    </div>
+<script setup>
+import { ref } from 'vue';
+import { useDateTime } from './composables/useDateTime';
 
-    <button @click="fetchUser" :disabled="isLoading">Reload User</button>
-  </div>
-</template>
+const myDate = ref('2026-12-25T12:00:00');
+const { formatted } = useDateTime(myDate);
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useTrpc } from '@/composables/useTrpc';
+// Later in a method:
+// myDate.value = '2027-01-01T00:00:00'; // useDateTime updates automatically
+</script>
+```
 
-const { client, isLoading, query } = useTrpc();
-const user = ref(null);
+```
+<script setup>
+const selectedDay = ref(25);
+const { formatted } = useDateTime(() => `2026-12-${selectedDay.value}T10:00:00`);
+</script>
+```
 
-const fetchUser = async () => {
-  // query() provides the loading state management
-  user.value = await query((t) => t.user.getById.query({ id: '42' }));
+```
+<script setup>
+const myDate = ref(new Date()); // Static
+const { formatted } = useDateTime(myDate);
+
+const makeLive = () => {
+  myDate.value = null; // The clock starts ticking every second!
 };
-
-onMounted(fetchUser);
 </script>
 ```
