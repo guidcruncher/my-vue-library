@@ -1,4 +1,7 @@
-import { App, inject, InjectionKey, onBeforeUnmount } from 'vue'
+import { inject, onBeforeUnmount } from 'vue'
+import type { App, InjectionKey } from 'vue'
+
+// -------------------- Types --------------------
 
 export type UnifiedEventKind = 'sse' | 'ws' | 'local'
 
@@ -19,11 +22,14 @@ export interface UnifiedSubscription {
 
 export interface UnifiedEventBus {
   subscribe<T = unknown>(channel: string, handler: UnifiedEventHandler<T>): UnifiedSubscription
-
   emitLocal<T = unknown>(channel: string, data: T): void
   emitRemote?<T = unknown>(channel: string, data: T): void
   close(): void
 }
+
+type AnyHandler = UnifiedEventHandler<any>
+
+type HandlerMap = Map<string, Set<AnyHandler>>
 
 interface TransportAdapter {
   start(push: (event: UnifiedEvent) => void): void
@@ -39,21 +45,26 @@ function safeJson(input: any): any {
   }
 }
 
-// SSE
+// -------------------- SSE Adapter --------------------
+
 class SseAdapter implements TransportAdapter {
+  private url: string
+  private init?: EventSourceInit
+  private channels: string[]
   private es: EventSource | null = null
 
-  constructor(
-    private url: string,
-    private init?: EventSourceInit,
-    private channels: string[] = ['message']
-  ) {}
+  constructor(url: string, init?: EventSourceInit, channels: string[] = ['message']) {
+    this.url = url
+    this.init = init
+    this.channels = channels
+  }
 
   start(push: (event: UnifiedEvent) => void): void {
-    this.es = new EventSource(this.url, this.init)
+    const es = new EventSource(this.url, this.init)
+    this.es = es
 
     for (const channel of this.channels) {
-      this.es.addEventListener(channel, (ev: MessageEvent) => {
+      es.addEventListener(channel, (ev: MessageEvent) => {
         push({
           source: 'sse',
           channel,
@@ -64,7 +75,7 @@ class SseAdapter implements TransportAdapter {
       })
     }
 
-    this.es.onerror = (err) => {
+    es.onerror = (err) => {
       push({
         source: 'sse',
         channel: '__error__',
@@ -76,26 +87,30 @@ class SseAdapter implements TransportAdapter {
   }
 
   close(): void {
-    this.es?.close()
+    if (this.es) this.es.close()
     this.es = null
   }
 }
 
-// WebSocket
+// -------------------- WebSocket Adapter --------------------
+
 class WebSocketAdapter implements TransportAdapter {
+  private url: string
+  private protocols?: string | string[]
   private ws: WebSocket | null = null
 
-  constructor(
-    private url: string,
-    private protocols?: string | string[]
-  ) {}
+  constructor(url: string, protocols?: string | string[]) {
+    this.url = url
+    this.protocols = protocols
+  }
 
   start(push: (event: UnifiedEvent) => void): void {
-    this.ws = new WebSocket(this.url, this.protocols)
+    const ws = new WebSocket(this.url, this.protocols)
+    this.ws = ws
 
-    this.ws.onmessage = (ev) => {
+    ws.onmessage = (ev) => {
       const parsed = safeJson(ev.data)
-      const { channel, data, id } = this.normalizeWsMessage(parsed)
+      const { channel, data, id } = this.normalize(parsed)
 
       push({
         source: 'ws',
@@ -107,7 +122,7 @@ class WebSocketAdapter implements TransportAdapter {
       })
     }
 
-    this.ws.onerror = (err) => {
+    ws.onerror = (err) => {
       push({
         source: 'ws',
         channel: '__error__',
@@ -118,17 +133,18 @@ class WebSocketAdapter implements TransportAdapter {
     }
   }
 
-  send<T = unknown>(channel: string, data: T): void {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return
-    this.ws.send(JSON.stringify({ channel, data }))
+  send<T>(channel: string, data: T): void {
+    const ws = this.ws
+    if (!ws || ws.readyState !== WebSocket.OPEN) return
+    ws.send(JSON.stringify({ channel, data }))
   }
 
   close(): void {
-    this.ws?.close()
+    if (this.ws) this.ws.close()
     this.ws = null
   }
 
-  private normalizeWsMessage(msg: any): { channel: string; data: any; id?: string } {
+  private normalize(msg: any): { channel: string; data: any; id?: string } {
     if (msg && typeof msg === 'object' && 'channel' in msg) {
       return { channel: msg.channel, data: msg.data, id: msg.id }
     }
@@ -136,7 +152,8 @@ class WebSocketAdapter implements TransportAdapter {
   }
 }
 
-// Local
+// -------------------- Local Adapter --------------------
+
 class LocalAdapter implements TransportAdapter {
   private target = new EventTarget()
   private push: ((event: UnifiedEvent) => void) | null = null
@@ -145,14 +162,14 @@ class LocalAdapter implements TransportAdapter {
     this.push = push
   }
 
-  emit<T = unknown>(channel: string, data: T): void {
+  emit<T>(channel: string, data: T): void {
     const event: UnifiedEvent<T> = {
       source: 'local',
       channel,
       data,
       timestamp: Date.now(),
     }
-    this.push?.(event)
+    if (this.push) this.push(event)
     this.target.dispatchEvent(new CustomEvent(channel, { detail: event }))
   }
 
@@ -161,27 +178,30 @@ class LocalAdapter implements TransportAdapter {
   }
 }
 
+// -------------------- Bus Factory --------------------
+
 export interface UnifiedEventBusOptions {
   sse?: { url: string; init?: EventSourceInit; channels?: string[] }
   ws?: { url: string; protocols?: string | string[] }
   local?: boolean
 }
 
-type HandlerMap = Map<string, Set<UnifiedEventHandler>>
-
 export function createUnifiedEventBus(opts: UnifiedEventBusOptions): UnifiedEventBus {
   const handlers: HandlerMap = new Map()
   const transports: TransportAdapter[] = []
+
   let wsAdapter: WebSocketAdapter | undefined
   let localAdapter: LocalAdapter | undefined
 
   if (opts.sse) {
     transports.push(new SseAdapter(opts.sse.url, opts.sse.init, opts.sse.channels))
   }
+
   if (opts.ws) {
     wsAdapter = new WebSocketAdapter(opts.ws.url, opts.ws.protocols)
     transports.push(wsAdapter)
   }
+
   if (opts.local !== false) {
     localAdapter = new LocalAdapter()
     transports.push(localAdapter)
@@ -189,81 +209,67 @@ export function createUnifiedEventBus(opts: UnifiedEventBusOptions): UnifiedEven
 
   const dispatch = (event: UnifiedEvent) => {
     const set = handlers.get(event.channel)
-    if (!set || set.size === 0) return
+    if (!set) return
     for (const handler of set) handler(event)
   }
 
   for (const t of transports) t.start(dispatch)
 
-  const bus: UnifiedEventBus = {
-    subscribe<T = unknown>(channel: string, handler: UnifiedEventHandler<T>): UnifiedSubscription {
+  return {
+    subscribe(channel, handler) {
       let set = handlers.get(channel)
       if (!set) {
         set = new Set()
         handlers.set(channel, set)
       }
-      set.add(handler as UnifiedEventHandler)
+      set.add(handler)
 
       return {
-        unsubscribe: () => {
+        unsubscribe() {
           const s = handlers.get(channel)
           if (!s) return
-          s.delete(handler as UnifiedEventHandler)
+          s.delete(handler)
           if (s.size === 0) handlers.delete(channel)
         },
       }
     },
 
-    emitLocal<T = unknown>(channel: string, data: T): void {
-      localAdapter?.emit(channel, data)
+    emitLocal(channel, data) {
+      if (localAdapter) localAdapter.emit(channel, data)
     },
 
-    emitRemote<T = unknown>(channel: string, data: T): void {
-      wsAdapter?.send(channel, data)
+    emitRemote(channel, data) {
+      if (wsAdapter) wsAdapter.send(channel, data)
     },
 
-    close(): void {
+    close() {
       for (const t of transports) t.close()
       handlers.clear()
     },
   }
-
-  return bus
 }
+
+// -------------------- Vue Plugin + Composables --------------------
 
 const UnifiedEventBusKey: InjectionKey<UnifiedEventBus> = Symbol('UnifiedEventBus')
 
-export interface UnifiedEventBusPluginOptions extends UnifiedEventBusOptions {}
-
 export const UnifiedEventBusPlugin = {
-  install(app: App, options: UnifiedEventBusPluginOptions) {
+  install(app: App, options: UnifiedEventBusOptions) {
     const bus = createUnifiedEventBus(options)
     app.provide(UnifiedEventBusKey, bus)
-
-    // optional: expose on app.config.globalProperties if you like
     ;(app.config.globalProperties as any).$eventBus = bus
   },
 }
 
 export function useUnifiedEventBus(): UnifiedEventBus {
   const bus = inject(UnifiedEventBusKey)
-  if (!bus) {
-    throw new Error(
-      '[UnifiedEventBus] No bus provided. Did you forget to app.use(UnifiedEventBusPlugin, ...)?'
-    )
-  }
+  if (!bus) throw new Error('UnifiedEventBus not provided')
   return bus
 }
 
-// Optional helper composable for auto-unsubscribe
-export function useUnifiedChannel<T = unknown>(
-  channel: string,
-  handler: UnifiedEventHandler<T>
-): void {
+export function useUnifiedChannel<T>(channel: string, handler: UnifiedEventHandler<T>): void {
   const bus = useUnifiedEventBus()
-  const sub: UnifiedSubscription = bus.subscribe<T>(channel, handler)
+  const sub = bus.subscribe(channel, handler)
 
-  onBeforeUnmount(() => {
-    sub.unsubscribe()
-  })
+  onBeforeUnmount(() => sub.unsubscribe())
 }
