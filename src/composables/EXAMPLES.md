@@ -701,3 +701,24 @@ const makeLive = () => {
 };
 </script>
 ```
+
+### useSSE
+
+```
+<script setup lang="ts">
+import { useSSE } from '@/composables/useSSE';
+
+const { isConnected, lastEvent, error } = useSSE<{ ts: number }>(
+  'http://localhost:3000/events',
+  { autoReconnect: true }
+);
+</script>
+
+<template>
+  <div>
+    <p>Connected: {{ isConnected }}</p>
+    <p>Last event: {{ lastEvent?.data.ts }}</p>
+    <p v-if="error">Error: {{ error }}</p>
+  </div>
+</template>
+```
