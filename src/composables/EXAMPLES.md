@@ -722,3 +722,88 @@ const { isConnected, lastEvent, error } = useSSE<{ ts: number }>(
   </div>
 </template>
 ```
+
+### useSSEAdvanced
+
+```
+<script setup lang="ts">
+interface MyChannels {
+  message: { ts: number };
+  ping: { id: string };
+  metrics: { cpu: number; mem: number };
+}
+
+const { events, isConnected } = useSSEAdvanced<MyChannels>(
+  'http://localhost:3000/events',
+  {
+    autoReconnect: true,
+    batch: { enabled: true, flushIntervalMs: 200 },
+  }
+);
+</script>
+<template>
+  <div>
+    <p>Connected: {{ isConnected }}</p>
+    <p>Last ping: {{ events.ping?.[events.ping.length - 1] }}</p>
+    <p>Last metric: {{ events.metrics?.[events.metrics.length - 1] }}</p>
+  </div>
+</template>
+```
+
+### useUnifiedEventBus
+
+```
+// main.ts
+import { createApp } from 'vue';
+import App from './App.vue';
+import { UnifiedEventBusPlugin } from './unified-event-bus-vue';
+
+const app = createApp(App);
+
+app.use(UnifiedEventBusPlugin, {
+  sse: { url: '/events', channels: ['message', 'notifications'] },
+  ws: { url: 'wss://example.com/ws' },
+  local: true,
+});
+
+app.mount('#app');
+```
+
+```
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useUnifiedEventBus, useUnifiedChannel } from '@/unified-event-bus-vue';
+import type { UnifiedEvent } from '@/unified-event-bus';
+
+interface ChatPayload {
+  text: string;
+  user?: string;
+}
+
+const messages = ref<string[]>([]);
+const bus = useUnifiedEventBus();
+
+// auto-subscribe/unsubscribe to "chat"
+useUnifiedChannel<ChatPayload>('chat', (ev: UnifiedEvent<ChatPayload>) => {
+  messages.value.push(`[${ev.source}] ${ev.data.user ?? 'anon'}: ${ev.data.text}`);
+});
+
+function sendLocal() {
+  bus.emitLocal<ChatPayload>('chat', { text: 'hello from local', user: 'me' });
+}
+
+function sendRemote() {
+  bus.emitRemote?.<ChatPayload>('chat', { text: 'hello over ws', user: 'me' });
+}
+</script>
+<template>
+  <div>
+    <button @click="sendLocal">Send local</button>
+    <button @click="sendRemote">Send remote (WS)</button>
+
+    <ul>
+      <li v-for="(m, i) in messages" :key="i">{{ m }}</li>
+    </ul>
+  </div>
+</template>
+```
