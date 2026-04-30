@@ -1,6 +1,6 @@
-import { ref } from "vue"
+import { ref } from 'vue'
 
-export type LogLevel = "debug" | "info" | "warn" | "error"
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 export interface LogEntry {
   timestamp: string
@@ -21,7 +21,7 @@ export interface LogConfig {
 
 const LOG_CONFIG = ref<LogConfig>({
   enabled: true,
-  minLevel: "debug",
+  minLevel: 'debug',
   replaceConsole: false,
 })
 
@@ -42,13 +42,13 @@ const ORIGINAL_CONSOLE = {
 }
 
 function applyConsoleOverride() {
-  console.debug = (...args) => useLogger("Console").debug(args[0], args[1])
-  console.info = (...args) => useLogger("Console").info(args[0], args[1])
-  console.warn = (...args) => useLogger("Console").warn(args[0], args[1])
-  console.error = (...args) => useLogger("Console").error(args[0], args[1])
+  console.debug = (...args) => useLogger('Console').debug(args[0], args[1])
+  console.info = (...args) => useLogger('Console').info(args[0], args[1])
+  console.warn = (...args) => useLogger('Console').warn(args[0], args[1])
+  console.error = (...args) => useLogger('Console').error(args[0], args[1])
 
   // Optional: redirect console.log → info
-  console.log = (...args) => useLogger("Console").info(args[0], args[1])
+  console.log = (...args) => useLogger('Console').info(args[0], args[1])
 }
 
 export function register(newConfig: Partial<LogConfig>) {
@@ -63,7 +63,7 @@ export function register(newConfig: Partial<LogConfig>) {
  * useLogger
  * @param namespace - Group logs by feature (e.g., "Auth", "Socket")
  */
-export function useLogger(namespace: string = "App") {
+export function useLogger(namespace: string = 'App') {
   const log = (level: LogLevel, message: string, payload?: any) => {
     if (!LOG_CONFIG.value.enabled) return
     if (LEVEL_WEIGHTS[level] < LEVEL_WEIGHTS[LOG_CONFIG.value.minLevel]) return
@@ -77,10 +77,10 @@ export function useLogger(namespace: string = "App") {
     }
 
     const colorMap: Record<LogLevel, string> = {
-      debug: "#7f8c8d",
-      info: "#2ecc71",
-      warn: "#f1c40f",
-      error: "#e74c3c",
+      debug: '#7f8c8d',
+      info: '#2ecc71',
+      warn: '#f1c40f',
+      error: '#e74c3c',
     }
 
     // Styled console output
@@ -88,8 +88,8 @@ export function useLogger(namespace: string = "App") {
       `%c[${entry.namespace}] %c${entry.level.toUpperCase()}%c: ${entry.message}`,
       `color: ${colorMap[level]}; font-weight: bold;`,
       `color: #fff; background: ${colorMap[level]}; padding: 2px 4px; border-radius: 3px;`,
-      "color: inherit; font-weight: normal;",
-      payload ?? "",
+      'color: inherit; font-weight: normal;',
+      payload ?? ''
     )
 
     if (LOG_CONFIG.value.transport) {
@@ -98,9 +98,9 @@ export function useLogger(namespace: string = "App") {
   }
 
   return {
-    debug: (msg: string, data?: any) => log("debug", msg, data),
-    info: (msg: string, data?: any) => log("info", msg, data),
-    warn: (msg: string, data?: any) => log("warn", msg, data),
-    error: (msg: string, data?: any) => log("error", msg, data),
+    debug: (msg: string, data?: any) => log('debug', msg, data),
+    info: (msg: string, data?: any) => log('info', msg, data),
+    warn: (msg: string, data?: any) => log('warn', msg, data),
+    error: (msg: string, data?: any) => log('error', msg, data),
   }
 }
