@@ -54,9 +54,21 @@ export function useRestClient(options: RestClientOptions = {}) {
     responseInterceptors.push(fn)
   }
 
+  const resolveUrl = (baseUrl: string | undefined, path: string): URL => {
+    const effectiveBase = baseUrl && baseUrl.trim().length > 0 ? baseUrl : window.location.origin
+
+    // If path is already absolute, return as-is
+    try {
+      return new URL(path)
+    } catch {
+      // Not absolute → resolve against effective base
+      return new URL(path, effectiveBase)
+    }
+  }
+
   const buildUrl = (path: string, params?: Record<string, string | number | boolean>) => {
     const base = options.baseUrl ?? ''
-    const url = new URL(path, base)
+    const url = resolveUrl(base, path)
 
     if (params) {
       for (const [key, value] of Object.entries(params)) {

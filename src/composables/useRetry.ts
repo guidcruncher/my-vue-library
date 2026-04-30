@@ -1,12 +1,12 @@
 export type RetryAlgorithm =
-  | "fixed"
-  | "linear"
-  | "exponential"
-  | "exponential-jitter"
-  | "equal-jitter"
-  | "decorrelated-jitter"
-  | "fibonacci"
-  | "polynomial"
+  | 'fixed'
+  | 'linear'
+  | 'exponential'
+  | 'exponential-jitter'
+  | 'equal-jitter'
+  | 'decorrelated-jitter'
+  | 'fibonacci'
+  | 'polynomial'
 
 export interface RetryOptions {
   retries: number
@@ -17,12 +17,13 @@ export interface RetryOptions {
 }
 
 function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function fibonacci(n: number): number {
   if (n <= 1) return 1
-  let a = 1, b = 1
+  let a = 1,
+    b = 1
   for (let i = 2; i <= n; i++) {
     const next = a + b
     a = b
@@ -31,51 +32,47 @@ function fibonacci(n: number): number {
   return b
 }
 
-function calculateDelay(
-  attempt: number,
-  opts: RetryOptions,
-  previousDelay?: number
-): number {
+function calculateDelay(attempt: number, opts: RetryOptions, previousDelay?: number): number {
   const { baseDelay, maxDelay = Infinity, algorithm } = opts
 
   let delay: number
 
   switch (algorithm) {
-    case "fixed":
+    case 'fixed':
       delay = baseDelay
       break
 
-    case "linear":
+    case 'linear':
       delay = baseDelay * attempt
       break
 
-    case "exponential":
+    case 'exponential':
       delay = baseDelay * Math.pow(2, attempt)
       break
 
-    case "exponential-jitter": {
+    case 'exponential-jitter': {
       const max = baseDelay * Math.pow(2, attempt)
       delay = Math.random() * max
       break
     }
 
-    case "equal-jitter": {
+    case 'equal-jitter': {
       const max = baseDelay * Math.pow(2, attempt)
       delay = max / 2 + Math.random() * (max / 2)
       break
     }
 
-    case "decorrelated-jitter": {
+    case 'decorrelated-jitter': {
       const prev = previousDelay ?? baseDelay
       delay = Math.min(maxDelay, Math.random() * prev * 3)
       break
     }
 
-    case "fibonacci":
+    case 'fibonacci':
       delay = fibonacci(attempt) * baseDelay
       break
 
-    case "polynomial":
+    case 'polynomial':
       delay = baseDelay * Math.pow(attempt, opts.polynomialPower ?? 2)
       break
 
@@ -86,20 +83,17 @@ function calculateDelay(
   return Math.min(delay, maxDelay)
 }
 
-export function useRetry(namespace = "Retry") {
+export function useRetry(namespace = 'Retry') {
   const prefix = `[${namespace}]`
 
-  async function retry<T>(
-    fn: () => Promise<T>,
-    opts: RetryOptions
-  ): Promise<T> {
+  async function retry<T>(fn: () => Promise<T>, opts: RetryOptions): Promise<T> {
     let lastError: unknown
     let previousDelay = opts.baseDelay
 
     for (let attempt = 0; attempt <= opts.retries; attempt++) {
       try {
         if (attempt > 0) {
-          console.warn(prefix, "Retry attempt", attempt)
+          console.warn(prefix, 'Retry attempt', attempt)
         }
 
         return await fn()
@@ -107,7 +101,7 @@ export function useRetry(namespace = "Retry") {
         lastError = err
 
         if (attempt === opts.retries) {
-          console.error(prefix, "Retry failed after max attempts", err)
+          console.error(prefix, 'Retry failed after max attempts', err)
           throw err
         }
 
@@ -127,4 +121,3 @@ export function useRetry(namespace = "Retry") {
     calculateDelay,
   }
 }
-
