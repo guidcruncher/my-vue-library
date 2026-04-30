@@ -7,45 +7,49 @@ import type { OpenAPIV3 } from "openapi-types";
 import { OpenApiRestClientGenerator } from "./openapi-rest-client-generator";
 
 export interface OpenApiPluginOptions {
-  /**
-   * Path or URL to the OpenAPI spec.
-   * Examples:
-   *   "./openapi.yaml"
-   *   "https://api.example.com/openapi.json"
-   */
-  source: string;
-
-  /**
-   * Output file to generate.
-   * Example: "src/api/client.ts"
-   */
-  output: string;
+  source: string;   // file path or URL
+  output: string;   // generated TS file
 }
 
 export function openApiRestClientPlugin(
   options: OpenApiPluginOptions
 ): Plugin {
-  const isRemote = options.source.startsWith("http://") || options.source.startsWith("https://");
+  const isRemote =
+    options.source.startsWith("http://") ||
+    options.source.startsWith("https://");
+
   const outputPath = path.resolve(options.output);
+
+  let isDev = false;
 
   return {
     name: "vite-plugin-openapi-rest-client",
-    apply: "serve",
+
+    configResolved(config) {
+      isDev = config.command === "serve";
+    },
 
     async buildStart() {
+      if (!isDev) return; // ⛔ skip in build mode
+
       await this.generateClient();
+
       if (!isRemote) {
         this.addWatchFile(path.resolve(options.source));
       }
     },
 
     async handleHotUpdate(ctx) {
+      if (!isDev) return;
+
       if (!isRemote && ctx.file.endsWith(options.source)) {
         await this.generateClient();
       }
     },
 
     async generateClient() {
+      if (!isDev) return;
+
       const spec = await loadOpenApi(options.source);
       const generator = new OpenApiRestClientGenerator(spec);
       const code = generator.generate();
