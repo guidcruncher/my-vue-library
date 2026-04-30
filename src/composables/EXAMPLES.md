@@ -342,6 +342,22 @@ const { mutate } = useOptimisticMutation(items);
 mutate(newList, async (val) => await api.save(val));
 ```
 
+### useRetry
+
+```
+const { retry } = useRetry("Network")
+
+await retry(
+  () => api.getSummary("HomeLAN"),
+  {
+    retries: 5,
+    baseDelay: 200,
+    maxDelay: 5000,
+    algorithm: "exponential-jitter",
+  }
+)
+```
+
 ### useExponentialBackoff
 
 Retries failed async tasks with increasing delay.
