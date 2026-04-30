@@ -3,7 +3,7 @@ import { ref } from 'vue'
 export function useDragDrop() {
   const isDragging = ref(false)
   const isOver = ref(false)
-  const dragData = ref<any>(null)
+  const dragData = ref<any>(undefined)
 
   /**
    * Bind to the element you want to drag
@@ -22,7 +22,7 @@ export function useDragDrop() {
     },
     onDragend: () => {
       isDragging.value = false
-      dragData.value = null
+      dragData.value = undefined
     },
   })
 

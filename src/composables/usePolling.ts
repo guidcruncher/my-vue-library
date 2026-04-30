@@ -2,7 +2,7 @@ import { ref, onUnmounted } from 'vue'
 
 export function usePolling(callback: () => Promise<any>, interval: number = 5000) {
   const isActive = ref(false)
-  let timer: ReturnType<typeof setTimeout> | null = null
+  let timer: ReturnType<typeof setTimeout> | undefined = undefined
 
   const poll = async () => {
     if (!isActive.value) return

@@ -2,11 +2,11 @@ import { ref, computed, watch, onUnmounted, toValue, type MaybeRefOrGetter } fro
 
 /**
  * @param source - A Date object, ISO string, Ref, or Getter function.
- * If null/undefined, it becomes a live clock.
+ * If undefined/undefined, it becomes a live clock.
  * @param timezone - IANA Timezone string (e.g., 'America/New_York')
  */
 export function useDateTime(
-  source?: MaybeRefOrGetter<Date | string | null | undefined>,
+  source?: MaybeRefOrGetter<Date | string | undefined | undefined>,
   timezone?: MaybeRefOrGetter<string>
 ) {
   // Resolve initial values using toValue (handles refs and getters)
@@ -16,7 +16,7 @@ export function useDateTime(
     () => toValue(timezone) || Intl.DateTimeFormat().resolvedOptions().timeZone
   )
 
-  let timer: ReturnType<typeof setInterval> | null = null
+  let timer: ReturnType<typeof setInterval> | undefined = undefined
 
   // 1. Logic for the Live Ticking Clock
   const startClock = () => {
@@ -30,11 +30,11 @@ export function useDateTime(
   const stopClock = () => {
     if (timer) {
       clearInterval(timer)
-      timer = null
+      timer = undefined
     }
   }
 
-  // 2. Watch the source: If source exists, sync 'now'; if source is null, tick.
+  // 2. Watch the source: If source exists, sync 'now'; if source is undefined, tick.
   watch(
     () => toValue(source),
     (newVal) => {

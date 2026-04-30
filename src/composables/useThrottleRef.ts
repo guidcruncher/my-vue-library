@@ -3,7 +3,7 @@ import { ref, watch, type Ref } from 'vue'
 export function useThrottleRef<T>(value: Ref<T>, limit: number = 300): Ref<T> {
   const throttledValue = ref(value.value) as Ref<T>
   let lastRan = 0
-  let timeout: ReturnType<typeof setTimeout> | null = null
+  let timeout: ReturnType<typeof setTimeout> | undefined = undefined
 
   watch(value, (newValue) => {
     const now = Date.now()

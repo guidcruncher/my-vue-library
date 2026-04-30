@@ -1,9 +1,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useGeolocation(options: PositionOptions = {}) {
-  const coords = ref<GeolocationCoordinates | null>(null)
-  const error = ref<GeolocationPositionError | null>(null)
-  let watcher: number | null = null
+  const coords = ref<GeolocationCoordinates | undefined>(undefined)
+  const error = ref<GeolocationPositionError | undefined>(undefined)
+  let watcher: number | undefined = undefined
 
   onMounted(() => {
     if ('geolocation' in navigator) {
@@ -16,7 +16,7 @@ export function useGeolocation(options: PositionOptions = {}) {
   })
 
   onUnmounted(() => {
-    if (watcher !== null) navigator.geolocation.clearWatch(watcher)
+    if (watcher !== undefined) navigator.geolocation.clearWatch(watcher)
   })
 
   return { coords, error }

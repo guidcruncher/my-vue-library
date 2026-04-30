@@ -33,12 +33,12 @@ export type ExtendedPermissionName =
 
 export function usePermission(name: MaybeRefOrGetter<ExtendedPermissionName>) {
   const state = ref<PermissionState | 'unknown' | 'unsupported'>('unknown')
-  let statusObj: PermissionStatus | null = null
+  let statusObj: PermissionStatus | undefined = undefined
 
   const cleanup = () => {
     if (statusObj) {
-      statusObj.onchange = null
-      statusObj = null
+      statusObj.onchange = undefined
+      statusObj = undefined
     }
   }
 

@@ -1,9 +1,9 @@
 import { ref, onUnmounted, type Ref } from 'vue'
 
 export interface UseJsonWebSocketReturn<T = any> {
-  data: Ref<T | null>
+  data: Ref<T | undefined>
   status: Ref<'OPEN' | 'CLOSED' | 'CONNECTING' | 'ERROR'>
-  error: Ref<Event | null>
+  error: Ref<Event | undefined>
   send: (payload: any) => void
   close: (code?: number, reason?: string) => void
   connect: () => void
@@ -15,11 +15,11 @@ export interface UseJsonWebSocketReturn<T = any> {
  */
 export function useJsonWebSocket<T = any>(url: string): UseJsonWebSocketReturn<T> {
   // Use a standard ref since JSON objects benefit from deep reactivity
-  const data = ref<T | null>(null) as Ref<T | null>
+  const data = ref<T | undefined>(undefined) as Ref<T | undefined>
   const status = ref<'OPEN' | 'CLOSED' | 'CONNECTING' | 'ERROR'>('CLOSED')
-  const error = ref<Event | null>(null)
+  const error = ref<Event | undefined>(undefined)
 
-  let socket: WebSocket | null = null
+  let socket: WebSocket | undefined = undefined
 
   const connect = () => {
     if (socket) socket.close()
@@ -29,7 +29,7 @@ export function useJsonWebSocket<T = any>(url: string): UseJsonWebSocketReturn<T
 
     socket.onopen = () => {
       status.value = 'OPEN'
-      error.value = null
+      error.value = undefined
     }
 
     socket.onclose = () => {

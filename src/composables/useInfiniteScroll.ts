@@ -5,7 +5,7 @@ export type InfiniteScrollCallback = () => Promise<void> | void
 export interface UseInfiniteScrollOptions {
   distance?: number
   disabled?: boolean
-  root?: HTMLElement | null
+  root?: HTMLElement | undefined
 }
 
 /**
@@ -13,7 +13,7 @@ export interface UseInfiniteScrollOptions {
  * A visibility-based trigger for infinite loading patterns.
  */
 export function useInfiniteScroll(
-  target: Ref<HTMLElement | null>,
+  target: Ref<HTMLElement | undefined>,
   callback: InfiniteScrollCallback,
   options: UseInfiniteScrollOptions = {}
 ) {
@@ -42,7 +42,7 @@ export function useInfiniteScroll(
       }
     },
     {
-      root: options.root ?? null,
+      root: options.root ?? undefined,
       rootMargin: `0px 0px ${options.distance ?? 10}px 0px`,
       threshold: 0.1,
     }

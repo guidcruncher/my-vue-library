@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 export function useIndexedDB(dbName: string, storeName: string) {
-  const db = ref<IDBDatabase | null>(null)
+  const db = ref<IDBDatabase | undefined>(undefined)
 
   const init = (): Promise<void> => {
     return new Promise((resolve, reject) => {

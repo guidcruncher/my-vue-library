@@ -26,16 +26,16 @@ export function useSSEAdvanced<Channels extends SSEChannelMap>(
   } = options
 
   const isConnected = ref(false)
-  const error = ref<Event | null>(null)
+  const error = ref<Event | undefined>(undefined)
 
   // Per-channel reactive event buffers
   const events = shallowRef<{
     [K in keyof Channels]?: Channels[K][]
   }>({})
 
-  let source: EventSource | null = null
+  let source: EventSource | undefined = undefined
   let reconnectDelay = 500
-  let batchTimer: number | null = null
+  let batchTimer: number | undefined = undefined
 
   const emitEvent = <K extends keyof Channels>(event: K, data: Channels[K]) => {
     if (!events.value[event]) {
@@ -51,11 +51,11 @@ export function useSSEAdvanced<Channels extends SSEChannelMap>(
 
   const scheduleBatchFlush = () => {
     if (!batch.enabled) return
-    if (batchTimer !== null) return
+    if (batchTimer !== undefined) return
 
     batchTimer = window.setTimeout(() => {
       flushBatch()
-      batchTimer = null
+      batchTimer = undefined
     }, batch.flushIntervalMs)
   }
 

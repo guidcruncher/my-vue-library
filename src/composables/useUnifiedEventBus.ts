@@ -51,7 +51,7 @@ class SseAdapter implements TransportAdapter {
   private url: string
   private init?: EventSourceInit
   private channels: string[]
-  private es: EventSource | null = null
+  private es: EventSource | undefined = undefined
 
   constructor(url: string, init?: EventSourceInit, channels: string[] = ['message']) {
     this.url = url
@@ -88,7 +88,7 @@ class SseAdapter implements TransportAdapter {
 
   close(): void {
     if (this.es) this.es.close()
-    this.es = null
+    this.es = undefined
   }
 }
 
@@ -97,7 +97,7 @@ class SseAdapter implements TransportAdapter {
 class WebSocketAdapter implements TransportAdapter {
   private url: string
   private protocols?: string | string[]
-  private ws: WebSocket | null = null
+  private ws: WebSocket | undefined = undefined
 
   constructor(url: string, protocols?: string | string[]) {
     this.url = url
@@ -141,7 +141,7 @@ class WebSocketAdapter implements TransportAdapter {
 
   close(): void {
     if (this.ws) this.ws.close()
-    this.ws = null
+    this.ws = undefined
   }
 
   private normalize(msg: any): { channel: string; data: any; id?: string } {
@@ -156,7 +156,7 @@ class WebSocketAdapter implements TransportAdapter {
 
 class LocalAdapter implements TransportAdapter {
   private target = new EventTarget()
-  private push: ((event: UnifiedEvent) => void) | null = null
+  private push: ((event: UnifiedEvent) => void) | undefined = undefined
 
   start(push: (event: UnifiedEvent) => void): void {
     this.push = push
@@ -174,7 +174,7 @@ class LocalAdapter implements TransportAdapter {
   }
 
   close(): void {
-    this.push = null
+    this.push = undefined
   }
 }
 

@@ -12,10 +12,10 @@ export interface SSEMessage<T = unknown> {
 
 export function useSSE<T = unknown>(url: string, options: SSEOptions = {}) {
   const isConnected = ref(false)
-  const lastEvent = ref<SSEMessage<T> | null>(null)
-  const error = ref<Event | null>(null)
+  const lastEvent = ref<SSEMessage<T> | undefined>(undefined)
+  const error = ref<Event | undefined>(undefined)
 
-  let source: EventSource | null = null
+  let source: EventSource | undefined = undefined
 
   const connect = () => {
     source = new EventSource(url, {

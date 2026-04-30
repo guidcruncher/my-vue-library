@@ -13,10 +13,10 @@ export interface RequestOptions<TBody> {
 }
 
 export interface RestResponse<T> {
-  data: T | null
+  data: T | undefined
   status: number
   ok: boolean
-  raw: Response | null
+  raw: Response | undefined
 }
 
 export type RequestInterceptor = (input: {
@@ -41,7 +41,7 @@ export type ResponseInterceptor<T = any> = (
 
 export function useRestClient(options: RestClientOptions = {}) {
   const loading = ref(false)
-  const error = ref<unknown>(null)
+  const error = ref<unknown>(undefined)
 
   const requestInterceptors: RequestInterceptor[] = []
   const responseInterceptors: ResponseInterceptor[] = []
@@ -103,7 +103,7 @@ export function useRestClient(options: RestClientOptions = {}) {
     const url = buildUrl(intercepted.path, intercepted.options.params)
 
     loading.value = true
-    error.value = null
+    error.value = undefined
 
     try {
       const res = await fetch(url, {
@@ -117,7 +117,7 @@ export function useRestClient(options: RestClientOptions = {}) {
         signal: intercepted.options.signal,
       })
 
-      const json = (await res.json().catch(() => null)) as TResponse | null
+      const json = (await res.json().catch(() => undefined)) as TResponse | undefined
 
       const baseResponse: RestResponse<TResponse> = {
         data: json,
@@ -131,10 +131,10 @@ export function useRestClient(options: RestClientOptions = {}) {
       error.value = err
 
       const failure: RestResponse<TResponse> = {
-        data: null,
+        data: undefined,
         status: 0,
         ok: false,
-        raw: null,
+        raw: undefined,
       }
 
       return await applyResponseInterceptors(failure)

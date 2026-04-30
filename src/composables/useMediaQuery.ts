@@ -2,7 +2,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useMediaQuery(query: string) {
   const matches = ref(false)
-  let mediaQueryList: MediaQueryList | null = null
+  let mediaQueryList: MediaQueryList | undefined = undefined
 
   const update = (e: MediaQueryListEvent | MediaQueryList) => {
     matches.value = e.matches

@@ -13,17 +13,17 @@ export interface GeoLocation {
 }
 
 export function useGeoLocationByIP() {
-  const location = ref<GeoLocation | null>(null)
+  const location = ref<GeoLocation | undefined>(undefined)
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const error = ref<string | undefined>(undefined)
   const isOnline = ref(navigator.onLine)
 
-  let lastIp: string | null = null
+  let lastIp: string | undefined = undefined
 
   async function fetchLocation() {
     try {
       loading.value = true
-      error.value = null
+      error.value = undefined
 
       const res = await fetch('https://geo.kamero.ai/api/geo', {
         cache: 'no-store',

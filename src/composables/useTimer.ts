@@ -19,7 +19,7 @@ export function useTimer(options: UseTimerOptions = {}): UseTimer {
   const time = ref(0)
   const isRunning = ref(false)
 
-  let handle: number | null = null
+  let handle: number | undefined = undefined
 
   const tick = () => {
     time.value += intervalMs
@@ -35,9 +35,9 @@ export function useTimer(options: UseTimerOptions = {}): UseTimer {
   const stop = () => {
     if (!isRunning.value) return
     isRunning.value = false
-    if (handle !== null) {
+    if (handle !== undefined) {
       clearInterval(handle)
-      handle = null
+      handle = undefined
     }
   }
 

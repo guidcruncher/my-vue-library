@@ -57,7 +57,7 @@ Uses Intersection Observer to trigger a callback when scrolling to the bottom of
 
 ```
 <script setup>
-const sentinel = ref(null);
+const sentinel = ref(undefined);
 const { isFetching } = useInfiniteScroll(sentinel, loadMoreData);
 </script>
 <template>
@@ -72,7 +72,7 @@ Reactive tracking of an element's width and height.
 
 ```
 <script setup>
-const container = ref(null);
+const container = ref(undefined);
 const { width, height } = useElementSize(container);
 </script>
 ```
@@ -449,7 +449,7 @@ Connect to the computer Camera if available and permitted
 import { ref, watch } from 'vue';
 import { useCamera } from './composables/useCamera';
 
-const videoElement = ref(null);
+const videoElement = ref(undefined);
 const { stream, error, isPending, isActive, start, stop } = useCamera();
 
 // When the stream becomes available, attach it to the video tag
@@ -728,7 +728,7 @@ const myDate = ref(new Date()); // Static
 const { formatted } = useDateTime(myDate);
 
 const makeLive = () => {
-  myDate.value = null; // The clock starts ticking every second!
+  myDate.value = undefined; // The clock starts ticking every second!
 };
 </script>
 ```

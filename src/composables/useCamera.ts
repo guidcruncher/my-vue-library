@@ -7,8 +7,8 @@ export interface CameraOptions {
 
 export function useCamera() {
   // Use shallowRef for the stream to avoid unnecessary deep reactivity overhead
-  const stream = shallowRef<MediaStream | null>(null)
-  const error = ref<Error | null>(null)
+  const stream = shallowRef<MediaStream | undefined>(undefined)
+  const error = ref<Error | undefined>(undefined)
   const isPending = ref(false)
   const isActive = ref(false)
 
@@ -22,7 +22,7 @@ export function useCamera() {
     }
 
     isPending.value = true
-    error.value = null
+    error.value = undefined
 
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia(options)
@@ -42,7 +42,7 @@ export function useCamera() {
   const stop = () => {
     if (stream.value) {
       stream.value.getTracks().forEach((track) => track.stop())
-      stream.value = null
+      stream.value = undefined
       isActive.value = false
     }
   }

@@ -1,6 +1,6 @@
 import { onMounted, onUnmounted, type Ref } from 'vue'
 
-export function useClickOutside(elRef: Ref<HTMLElement | null>, callback: () => void) {
+export function useClickOutside(elRef: Ref<HTMLElement | undefined>, callback: () => void) {
   const listener = (event: MouseEvent | TouchEvent) => {
     if (!elRef.value || elRef.value.contains(event.target as Node)) {
       return

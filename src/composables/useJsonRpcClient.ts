@@ -20,7 +20,7 @@ export interface JsonRpcError {
     message: string
     data?: any
   }
-  id: number | string | null
+  id: number | string | undefined
 }
 
 export type JsonRpcResponse<T = any> = JsonRpcSuccess<T> | JsonRpcError
@@ -31,7 +31,7 @@ type PendingRequest = {
 }
 
 export function useJsonRpcClient(url: string, autoReconnect = true) {
-  const ws = ref<WebSocket | null>(null)
+  const ws = ref<WebSocket | undefined>(undefined)
   const isConnected = ref(false)
 
   let requestId = 1
@@ -56,7 +56,7 @@ export function useJsonRpcClient(url: string, autoReconnect = true) {
       const msg = JSON.parse(event.data)
 
       // Response to a request
-      if (msg.id !== undefined && msg.id !== null) {
+      if (msg.id !== undefined && msg.id !== undefined) {
         const pendingReq = pending.get(msg.id)
         if (!pendingReq) return
 

@@ -32,7 +32,7 @@ export function useNotification() {
   const showNotification = (options: NotificationOptions) => {
     if (!isSupported.value || permission.value !== 'granted') {
       console.warn('Notifications are not supported or permission was denied.')
-      return null
+      return undefined
     }
 
     const { title, ...rest } = options

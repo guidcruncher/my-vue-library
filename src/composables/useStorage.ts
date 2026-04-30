@@ -17,7 +17,7 @@ export function useStorage<T>(key: string, defaultValue: T, storage: Storage = l
   watch(
     data,
     (newValue) => {
-      if (newValue === null || newValue === undefined) {
+      if (newValue === undefined || newValue === undefined) {
         storage.removeItem(key)
       } else {
         storage.setItem(key, JSON.stringify(newValue))

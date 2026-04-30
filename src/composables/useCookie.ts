@@ -3,10 +3,10 @@ import { ref, watch } from 'vue'
 export function useCookie(key: string, options: { expires?: number | Date; path?: string } = {}) {
   const getCookie = () => {
     const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
-    return match ? decodeURIComponent(match[2]) : null
+    return match ? decodeURIComponent(match[2]) : undefined
   }
 
-  const cookieValue = ref<string | null>(getCookie())
+  const cookieValue = ref<string | undefined>(getCookie())
 
   watch(cookieValue, (newVal) => {
     let str = `${encodeURIComponent(key)}=${encodeURIComponent(newVal ?? '')}`

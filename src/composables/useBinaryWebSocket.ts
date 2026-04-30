@@ -3,9 +3,9 @@ import { ref, onUnmounted, shallowRef, type Ref } from 'vue'
 export type BinaryData = ArrayBuffer | Blob
 
 export interface UseBinaryWebSocketReturn {
-  data: Ref<BinaryData | null>
+  data: Ref<BinaryData | undefined>
   status: Ref<'OPEN' | 'CLOSED' | 'CONNECTING' | 'ERROR'>
-  error: Ref<Event | null>
+  error: Ref<Event | undefined>
   send: (payload: string | Blob | BufferSource) => void
   close: (code?: number, reason?: string) => void
   connect: () => void
@@ -21,11 +21,11 @@ export function useBinaryWebSocket(
   useBlob: boolean = false
 ): UseBinaryWebSocketReturn {
   // Use shallowRef for binary data to prevent expensive deep reactivity on byte arrays
-  const data = shallowRef<BinaryData | null>(null)
+  const data = shallowRef<BinaryData | undefined>(undefined)
   const status = ref<'OPEN' | 'CLOSED' | 'CONNECTING' | 'ERROR'>('CLOSED')
-  const error = ref<Event | null>(null)
+  const error = ref<Event | undefined>(undefined)
 
-  let socket: WebSocket | null = null
+  let socket: WebSocket | undefined = undefined
 
   const connect = () => {
     if (socket) socket.close()
@@ -36,7 +36,7 @@ export function useBinaryWebSocket(
 
     socket.onopen = () => {
       status.value = 'OPEN'
-      error.value = null
+      error.value = undefined
     }
 
     socket.onclose = () => {
