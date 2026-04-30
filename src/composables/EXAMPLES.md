@@ -88,6 +88,21 @@ logger.info('User Logged In', { userId: 123 });
 </script>
 ```
 
+```
+<script setup>
+const logger = useLogger('AuthModule');
+logger.register({
+  replaceConsole: true,
+  minLevel: "debug",
+})
+
+console.log("Hello")     → useLogger("Console").info("Hello")
+console.warn("Oops")     → useLogger("Console").warn("Oops")
+console.error("Boom")    → useLogger("Console").error("Boom")
+console.debug("Trace")   → useLogger("Console").debug("Trace")
+</script>
+```
+
 ### useEventBus
 
 Global singleton for cross-component communication.
