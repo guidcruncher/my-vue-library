@@ -130,7 +130,6 @@ export async function retry<T>(fn: () => Promise<T>, opts: RetryOptions): Promis
   throw lastError
 }
 
-
 /*
 await retry(
   () => axios.get("/api/network/scan"),
