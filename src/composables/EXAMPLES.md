@@ -839,6 +839,8 @@ function sendRemote() {
 </template>
 ```
 
+## Audio and Synth
+
 ### useAudio
 
 ```
@@ -926,4 +928,83 @@ seq.onStep((step) => {
 const start = () => seq.start();
 const stop = () => seq.stop();
 </script>
+```
+
+### useSynthEngine
+
+```
+<script setup lang="ts">
+import { useSynthEngine } from './useSynthEngine';
+
+const engine = useSynthEngine({
+  polyphony: 8,
+  waveform: 'sawtooth',
+  envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
+  filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
+});
+
+// Play a note
+const playC4 = () => engine.noteOn(60);
+const stopC4 = () => engine.noteOff(60);
+
+// Add LFO to filter
+const lfo = engine.addLfo({ frequency: 4, depth: 200 });
+engine.addLfoRoute(lfo, engine.setFilter.frequency);
+
+// Start arpeggiator
+const startArp = () => engine.startArp([60, 64, 67], 120);
+</script>
+```
+
+### useSynthUI
+
+```
+<script setup lang="ts">
+import { useSynthEngine } from './composables/useSynth';
+import { useSynthUI } from './composables/useSynthUI';
+
+const engine = useSynthEngine({
+  polyphony: 8,
+  waveform: 'sawtooth',
+  envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
+  filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
+});
+
+const ui = useSynthUI({ engine });
+
+// Example: bind filter when slider moves
+const updateFilter = () => ui.bindFilter();
+</script>
+
+<template>
+  <div class="p-4 space-y-4">
+    <label>Filter Frequency</label>
+    <input
+      type="range"
+      min="50"
+      max="20000"
+      :value="ui.filterFreq"
+      @input="ui.filterFreq = Number($event.target.value); updateFilter()"
+    />
+
+    <label>Filter Q</label>
+    <input
+      type="range"
+      min="0.1"
+      max="20"
+      step="0.1"
+      :value="ui.filterQ"
+      @input="ui.filterQ = Number($event.target.value); updateFilter()"
+    />
+
+    <button @click="engine.noteOn(60)">Play C4</button>
+    <button @click="engine.noteOff(60)">Stop C4</button>
+  </div>
+</template>
+```
+
+###
+
+```
+
 ```
