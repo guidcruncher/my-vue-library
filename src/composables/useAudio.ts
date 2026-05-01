@@ -1,102 +1,102 @@
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 export interface UseAudio {
-  playing: ReturnType<typeof computed<boolean>>;
-  currentTime: ReturnType<typeof computed<number>>;
-  duration: ReturnType<typeof computed<number>>;
-  canPlay: ReturnType<typeof computed<boolean>>;
-  error: ReturnType<typeof computed<Error | null>>;
-  play: () => Promise<void>;
-  pause: () => void;
-  toggle: () => Promise<void>;
-  setTime: (time: number) => void;
-  setVolume: (volume: number) => void;
+  playing: ReturnType<typeof computed<boolean>>
+  currentTime: ReturnType<typeof computed<number>>
+  duration: ReturnType<typeof computed<number>>
+  canPlay: ReturnType<typeof computed<boolean>>
+  error: ReturnType<typeof computed<Error | null>>
+  play: () => Promise<void>
+  pause: () => void
+  toggle: () => Promise<void>
+  setTime: (time: number) => void
+  setVolume: (volume: number) => void
 }
 
 export function useAudio(src: string): UseAudio {
-  const audio = ref<HTMLAudioElement | null>(null);
+  const audio = ref<HTMLAudioElement | null>(null)
 
-  const _playing = ref(false);
-  const _currentTime = ref(0);
-  const _duration = ref(0);
-  const _canPlay = ref(false);
-  const _error = ref<Error | null>(null);
+  const _playing = ref(false)
+  const _currentTime = ref(0)
+  const _duration = ref(0)
+  const _canPlay = ref(false)
+  const _error = ref<Error | null>(null)
 
-  const playing = computed(() => _playing.value);
-  const currentTime = computed(() => _currentTime.value);
-  const duration = computed(() => _duration.value);
-  const canPlay = computed(() => _canPlay.value);
-  const error = computed(() => _error.value);
+  const playing = computed(() => _playing.value)
+  const currentTime = computed(() => _currentTime.value)
+  const duration = computed(() => _duration.value)
+  const canPlay = computed(() => _canPlay.value)
+  const error = computed(() => _error.value)
 
   const play = async () => {
-    if (!audio.value) return;
+    if (!audio.value) return
     try {
-      await audio.value.play();
-      _playing.value = true;
+      await audio.value.play()
+      _playing.value = true
     } catch (err) {
-      _error.value = err as Error;
+      _error.value = err as Error
     }
-  };
+  }
 
   const pause = () => {
-    if (!audio.value) return;
-    audio.value.pause();
-    _playing.value = false;
-  };
+    if (!audio.value) return
+    audio.value.pause()
+    _playing.value = false
+  }
 
   const toggle = async () => {
-    if (_playing.value) pause();
-    else await play();
-  };
+    if (_playing.value) pause()
+    else await play()
+  }
 
   const setTime = (time: number) => {
-    if (!audio.value) return;
-    audio.value.currentTime = time;
-  };
+    if (!audio.value) return
+    audio.value.currentTime = time
+  }
 
   const setVolume = (volume: number) => {
-    if (!audio.value) return;
-    audio.value.volume = volume;
-  };
+    if (!audio.value) return
+    audio.value.volume = volume
+  }
 
   const bindEvents = () => {
-    if (!audio.value) return;
+    if (!audio.value) return
 
     audio.value.addEventListener('timeupdate', () => {
-      _currentTime.value = audio.value!.currentTime;
-    });
+      _currentTime.value = audio.value!.currentTime
+    })
 
     audio.value.addEventListener('loadedmetadata', () => {
-      _duration.value = audio.value!.duration;
-      _canPlay.value = true;
-    });
+      _duration.value = audio.value!.duration
+      _canPlay.value = true
+    })
 
     audio.value.addEventListener('play', () => {
-      _playing.value = true;
-    });
+      _playing.value = true
+    })
 
     audio.value.addEventListener('pause', () => {
-      _playing.value = false;
-    });
+      _playing.value = false
+    })
 
     audio.value.addEventListener('error', () => {
-      _error.value = new Error('Audio playback error');
-    });
-  };
+      _error.value = new Error('Audio playback error')
+    })
+  }
 
   onMounted(() => {
-    audio.value = new Audio(src);
-    audio.value.preload = 'auto';
-    bindEvents();
-  });
+    audio.value = new Audio(src)
+    audio.value.preload = 'auto'
+    bindEvents()
+  })
 
   onBeforeUnmount(() => {
     if (audio.value) {
-      audio.value.pause();
-      audio.value.src = '';
-      audio.value.load();
+      audio.value.pause()
+      audio.value.src = ''
+      audio.value.load()
     }
-  });
+  })
 
   return {
     playing,
@@ -109,5 +109,5 @@ export function useAudio(src: string): UseAudio {
     toggle,
     setTime,
     setVolume,
-  };
+  }
 }
