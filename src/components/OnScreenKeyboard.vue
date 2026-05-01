@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useSynthEngine } from '@/composables/useSynth';
+import { ref } from 'vue'
+import { useSynthEngine } from '@/composables/useSynth'
 
 // --- ENGINE ---
 const engine = useSynthEngine({
@@ -8,32 +8,32 @@ const engine = useSynthEngine({
   waveform: 'sawtooth',
   envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
   filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
-});
+})
 
 // --- KEYBOARD RANGE ---
-const startNote = 48; // C3
-const endNote = 72;   // C5
+const startNote = 48 // C3
+const endNote = 72 // C5
 
 // White/black key detection
 const isBlack = (note: number) => {
-  const mod = note % 12;
-  return [1, 3, 6, 8, 10].includes(mod);
-};
+  const mod = note % 12
+  return [1, 3, 6, 8, 10].includes(mod)
+}
 
 // Active notes for UI highlighting
-const activeNotes = ref(new Set<number>());
+const activeNotes = ref(new Set<number>())
 
 const noteOn = (note: number) => {
-  activeNotes.value.add(note);
-  engine.noteOn(note);
-};
+  activeNotes.value.add(note)
+  engine.noteOn(note)
+}
 
 const noteOff = (note: number) => {
-  activeNotes.value.delete(note);
-  engine.noteOff(note);
-};
+  activeNotes.value.delete(note)
+  engine.noteOff(note)
+}
 
-const keys = Array.from({ length: endNote - startNote + 1 }, (_, i) => startNote + i);
+const keys = Array.from({ length: endNote - startNote + 1 }, (_, i) => startNote + i)
 </script>
 
 <template>
@@ -45,7 +45,7 @@ const keys = Array.from({ length: endNote - startNote + 1 }, (_, i) => startNote
       :class="{
         black: isBlack(note),
         white: !isBlack(note),
-        active: activeNotes.has(note)
+        active: activeNotes.has(note),
       }"
       @mousedown="noteOn(note)"
       @mouseup="noteOff(note)"

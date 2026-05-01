@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useMidiKeyboard } from '@/composables/useMidiKeyboard';
-import { useSynthEngine } from '@/composables/useSynthEngine';
+import { ref } from 'vue'
+import { useMidiKeyboard } from '@/composables/useMidiKeyboard'
+import { useSynthEngine } from '@/composables/useSynthEngine'
 
 const engine = useSynthEngine({
   polyphony: 8,
   waveform: 'sawtooth',
   envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
   filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
-});
+})
 
-const midi = useMidiKeyboard();
+const midi = useMidiKeyboard()
 
 // Bind MIDI → Synth
-midi.onNoteOn(({ note, velocity }) => engine.noteOn(note));
-midi.onNoteOff(({ note }) => engine.noteOff(note));
+midi.onNoteOn(({ note, velocity }) => engine.noteOn(note))
+midi.onNoteOff(({ note }) => engine.noteOff(note))
 
 // On‑screen keyboard notes
 const keys = [
@@ -26,9 +26,9 @@ const keys = [
   { note: 69, label: 'A4' },
   { note: 71, label: 'B4' },
   { note: 72, label: 'C5' },
-];
+]
 
-const isActive = (note: number) => midi.activeNotes.value.has(note);
+const isActive = (note: number) => midi.activeNotes.value.has(note)
 </script>
 
 <template>

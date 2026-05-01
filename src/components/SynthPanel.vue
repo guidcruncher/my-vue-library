@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useSynthEngine } from '@/composables/useSynthEngine';
-import { useSynthUI } from '@/composables/useSynthUI';
-import { usePatchStorage } from '@/composables/usePatchStorage';
+import { computed } from 'vue'
+import { useSynthEngine } from '@/composables/useSynthEngine'
+import { useSynthUI } from '@/composables/useSynthUI'
+import { usePatchStorage } from '@/composables/usePatchStorage'
 
 // ENGINE
 const engine = useSynthEngine({
@@ -10,27 +10,26 @@ const engine = useSynthEngine({
   waveform: 'sawtooth',
   envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
   filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
-});
+})
 
 // PATCH STORAGE
 const storage = usePatchStorage({
   namespace: 'synth-patches',
   version: 1,
-});
+})
 
 // UI LAYER
-const ui = useSynthUI({ engine, storage });
+const ui = useSynthUI({ engine, storage })
 
 // PATCH NAME INPUT
-const patchName = ref('My Patch');
+const patchName = ref('My Patch')
 
 // Helpers
-const patchList = computed(() => storage.patches.value.map(p => p.name));
+const patchList = computed(() => storage.patches.value.map((p) => p.name))
 </script>
 
 <template>
   <div class="synth-panel">
-
     <!-- FILTER SECTION -->
     <section class="panel-section">
       <h2>Filter</h2>
@@ -44,13 +43,7 @@ const patchList = computed(() => storage.patches.value.map(p => p.name));
       </select>
 
       <label>Frequency</label>
-      <input
-        type="range"
-        min="50"
-        max="20000"
-        v-model="ui.filterFreq"
-        @input="ui.bindFilter()"
-      />
+      <input type="range" min="50" max="20000" v-model="ui.filterFreq" @input="ui.bindFilter()" />
 
       <label>Resonance (Q)</label>
       <input
@@ -122,7 +115,6 @@ const patchList = computed(() => storage.patches.value.map(p => p.name));
         <button @mousedown="engine.noteOn(67)" @mouseup="engine.noteOff(67)">G4</button>
       </div>
     </section>
-
   </div>
 </template>
 
