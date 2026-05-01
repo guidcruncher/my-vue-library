@@ -36,6 +36,7 @@ export interface SynthEngine {
   triggerSample: (name: string) => void
   startArp: (notes: number[], bpm: number, division?: number) => void
   stopArp: () => void
+  filterNode: any
 }
 
 export function useSynthEngine(opts: SynthEngineOptions): SynthEngine {
@@ -144,6 +145,7 @@ export function useSynthEngine(opts: SynthEngineOptions): SynthEngine {
   })
 
   return {
+    filterNode: filter,
     noteOn,
     noteOff,
     setFilter,

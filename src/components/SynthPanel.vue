@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useSynthEngine } from '../composables/useSynthEngine'
 import { useSynthUI } from '../composables/useSynthUI'
 import { usePatchStorage } from '../composables/usePatchStorage'
+import type { PatchStorage } from '../composables/usePatchStorage'
 
 // ENGINE
 const engine = useSynthEngine({
@@ -16,7 +17,7 @@ const engine = useSynthEngine({
 const storage = usePatchStorage({
   namespace: 'synth-patches',
   version: 1,
-})
+}) as PatchStorage
 
 // UI LAYER
 const ui = useSynthUI({ engine, storage })
@@ -25,7 +26,7 @@ const ui = useSynthUI({ engine, storage })
 const patchName = ref('My Patch')
 
 // Helpers
-const patchList = computed(() => storage.patches.value.map((p) => p.name))
+const patchList = computed(() => storage.patches.value!.map(p => p.name))
 </script>
 
 <template>
@@ -83,7 +84,7 @@ const patchList = computed(() => storage.patches.value.map((p) => p.name))
       <label>Depth</label>
       <input type="range" min="0" max="1000" step="1" v-model="ui.lfoDepth" />
 
-      <button @click="ui.createLfoRoute(engine.setFilter.frequency)">
+      <button @click="ui.createLfoRoute(engine.filterNode!.node.frequency)">
         Modulate Filter Frequency
       </button>
     </section>
