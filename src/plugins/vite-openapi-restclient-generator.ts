@@ -4,7 +4,7 @@ import path from 'node:path'
 import YAML from 'yaml'
 import type { Plugin } from 'vite'
 import type { OpenAPIV3 } from 'openapi-types'
-import { OpenApiRestClientGenerator } from './openapi-rest-client-generator'
+import { OpenApiRestClientGenerator } from './openapi-restclient-generator'
 
 export interface OpenApiPluginOptions {
   source: string // file path or URL

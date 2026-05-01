@@ -13,7 +13,11 @@ function isParamRef(param: ParameterOrRef): param is OpenAPIV3.ReferenceObject {
 }
 
 export class OpenApiRestClientGenerator {
-  constructor(private readonly spec: OpenAPIV3.Document) {}
+  private readonly spec: OpenAPIV3.Document
+
+  constructor(spec: OpenAPIV3.Document) {
+    this.spec = spec
+  }
 
   generate(): string {
     const parts: string[] = []

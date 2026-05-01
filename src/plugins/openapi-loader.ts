@@ -3,7 +3,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import YAML from 'yaml'
 import type { OpenAPIV3 } from 'openapi-types'
-import { OpenApiRestClientGenerator } from './openapi-rest-client-generator'
+import { OpenApiRestClientGenerator } from './openapi-restclient-generator'
 
 export class OpenApiLoader {
   static async fromFile(filePath: string): Promise<OpenApiRestClientGenerator> {
