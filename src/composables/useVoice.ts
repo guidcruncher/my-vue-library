@@ -1,4 +1,3 @@
-import { type Ref } from 'vue'
 
 export interface VoiceOptions {
   waveform: OscillatorType

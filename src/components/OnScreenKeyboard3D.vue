@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useSynthEngine } from '@/composables/useSynthEngine'
+import { useSynthEngine } from '../composables/useSynthEngine'
 
 // --- ENGINE ---
 const engine = useSynthEngine({

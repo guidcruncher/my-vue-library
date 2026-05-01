@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSynthEngine } from '@/composables/useSynthEngine'
-import { useSynthUI } from '@/composables/useSynthUI'
-import { usePatchStorage } from '@/composables/usePatchStorage'
+import { useSynthEngine } from '../composables/useSynthEngine'
+import { useSynthUI } from '../composables/useSynthUI'
+import { usePatchStorage } from '../composables/usePatchStorage'
 
 // ENGINE
 const engine = useSynthEngine({
