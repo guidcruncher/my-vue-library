@@ -1,6 +1,7 @@
 export interface ModRoute {
   source: AudioNode | AudioParam
   target: AudioParam
+  ctx: AudioContext
 }
 
 export interface ModMatrix {
@@ -13,36 +14,24 @@ export function useModMatrix(): ModMatrix {
   const routes: ModRoute[] = []
 
   const addRoute = (route: ModRoute) => {
-    routes.push(route)
+    const { source, target, ctx } = route
 
-    if (route.source instanceof AudioParam) {
-      // AudioParam → AudioParam is not directly connectable
-      // Create a GainNode as a bridge
-      const ctx = route.target.context
-      const gain = ctx.createGain()
-      gain.gain.value = 1
+    const gain = ctx.createGain()
+    gain.gain.value = 1
 
-      // sourceParam → gain → targetParam
-      route.source.connect(gain)
-      gain.connect(route.target)
+    if (source instanceof AudioParam) {
+      // AudioParam → Gain → AudioParam
+      ;(source as any).connect?.(gain)
     } else {
-      // AudioNode → AudioParam
-      route.source.connect(route.target)
+      source.connect(gain)
     }
+
+    gain.connect(target)
+
+    routes.push(route)
   }
 
   const clear = () => {
-    for (const r of routes) {
-      try {
-        if (r.source instanceof AudioParam) {
-          // Cannot disconnect AudioParam directly
-        } else {
-          r.source.disconnect(r.target)
-        }
-      } catch {
-        // ignore disconnect errors
-      }
-    }
     routes.length = 0
   }
 

@@ -90,7 +90,11 @@ export function useSynthEngine(opts: SynthEngineOptions): SynthEngine {
   }
 
   const addLfoRoute = (lfo: ReturnType<typeof useLfo>, target: AudioParam) => {
-    modMatrix.addRoute({ source: lfo.gain, target })
+    modMatrix.addRoute({
+      source: lfo.gain,
+      target,
+      ctx: ctx.value!,
+    })
   }
 
   const loadSample = (name: string, buffer: AudioBuffer) => {

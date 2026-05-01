@@ -26,7 +26,7 @@ const ui = useSynthUI({ engine, storage })
 const patchName = ref('My Patch')
 
 // Helpers
-const patchList = computed(() => storage.patches.value!.map(p => p.name))
+const patchList = computed(() => storage.patches.value!.map((p) => p.name))
 </script>
 
 <template>

@@ -1,17 +1,17 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import type { ComputedRef } from 'vue';
+import type { ComputedRef } from 'vue'
 
 export interface UseAudio {
-  playing: ComputedRef<boolean>;
-  currentTime: ComputedRef<number>;
-  duration: ComputedRef<number>;
-  canPlay: ComputedRef<boolean>;
-  error: ComputedRef<Error | null>;
-  play: () => Promise<void>;
-  pause: () => void;
-  toggle: () => Promise<void>;
-  setTime: (time: number) => void;
-  setVolume: (volume: number) => void;
+  playing: ComputedRef<boolean>
+  currentTime: ComputedRef<number>
+  duration: ComputedRef<number>
+  canPlay: ComputedRef<boolean>
+  error: ComputedRef<Error | null>
+  play: () => Promise<void>
+  pause: () => void
+  toggle: () => Promise<void>
+  setTime: (time: number) => void
+  setVolume: (volume: number) => void
 }
 
 export function useAudio(src: string): UseAudio {

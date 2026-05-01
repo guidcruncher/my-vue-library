@@ -1,4 +1,3 @@
-
 export interface VoiceOptions {
   waveform: OscillatorType
   frequency: number
