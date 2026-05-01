@@ -1,5 +1,6 @@
 // useAudio.ts
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import type { ComputedRef } from 'vue'
 
 export interface UseAudioOptions {
   autoplay?: boolean
@@ -8,11 +9,11 @@ export interface UseAudioOptions {
 }
 
 export interface UseAudio {
-  playing: Readonly<ReturnType<typeof computed<boolean>>>
-  currentTime: Readonly<ReturnType<typeof computed<number>>>
-  duration: Readonly<ReturnType<typeof computed<number>>>
-  canPlay: Readonly<ReturnType<typeof computed<boolean>>>
-  error: Readonly<ReturnType<typeof computed<Error | null>>>
+  playing: ComputedRef<boolean>
+  currentTime: ComputedRef<number>
+  duration: ComputedRef<number>
+  canPlay: ComputedRef<boolean>
+  error: ComputedRef<Error | null>
   play: () => Promise<void>
   pause: () => void
   toggle: () => Promise<void>
