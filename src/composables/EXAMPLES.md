@@ -961,6 +961,7 @@ const startArp = () => engine.startArp([60, 64, 67], 120);
 ```
 <script setup lang="ts">
 import { useSynthEngine } from './composables/useSynth';
+import { usePatchStorage } from './composables/usePatchStorage';
 import { useSynthUI } from './composables/useSynthUI';
 
 const engine = useSynthEngine({
@@ -970,37 +971,13 @@ const engine = useSynthEngine({
   filter: { mode: 'lowpass', frequency: 800, q: 1.2 },
 });
 
-const ui = useSynthUI({ engine });
+const storage = usePatchStorage({
+  namespace: 'my-synth',
+  version: 1,
+});
 
-// Example: bind filter when slider moves
-const updateFilter = () => ui.bindFilter();
+const ui = useSynthUI({ engine, storage });
 </script>
-
-<template>
-  <div class="p-4 space-y-4">
-    <label>Filter Frequency</label>
-    <input
-      type="range"
-      min="50"
-      max="20000"
-      :value="ui.filterFreq"
-      @input="ui.filterFreq = Number($event.target.value); updateFilter()"
-    />
-
-    <label>Filter Q</label>
-    <input
-      type="range"
-      min="0.1"
-      max="20"
-      step="0.1"
-      :value="ui.filterQ"
-      @input="ui.filterQ = Number($event.target.value); updateFilter()"
-    />
-
-    <button @click="engine.noteOn(60)">Play C4</button>
-    <button @click="engine.noteOff(60)">Stop C4</button>
-  </div>
-</template>
 ```
 
 ###

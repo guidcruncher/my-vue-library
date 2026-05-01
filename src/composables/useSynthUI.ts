@@ -1,9 +1,11 @@
 // useSynthUI.ts
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import type { SynthEngine } from './useSynth'
+import type { PatchStorage } from './usePatchStorage'
 
 export interface SynthUIOptions {
   engine: SynthEngine
+  storage: PatchStorage
 }
 
 export interface SynthUI {
@@ -22,33 +24,31 @@ export interface SynthUI {
 
   // actions
   bindFilter: () => void
-  bindEnvelope: () => void
   createLfoRoute: (target: AudioParam) => void
 
   // patching
-  savePatch: () => Record<string, number | string>
-  loadPatch: (patch: Record<string, number | string>) => void
+  savePatch: (name: string) => void
+  loadPatch: (name: string) => void
 }
 
 export function useSynthUI(opts: SynthUIOptions): SynthUI {
-  const { engine } = opts
+  const { engine, storage } = opts
 
-  // FILTER UI STATE
+  // FILTER
   const filterMode = ref<BiquadFilterType>('lowpass')
   const filterFreq = ref(800)
   const filterQ = ref(1.2)
 
-  // ENVELOPE UI STATE
+  // ENVELOPE
   const attack = ref(0.01)
   const decay = ref(0.2)
   const sustain = ref(0.7)
   const release = ref(0.3)
 
-  // LFO UI STATE
+  // LFO
   const lfoFreq = ref(4)
   const lfoDepth = ref(200)
 
-  // APPLY FILTER TO ENGINE
   const bindFilter = () => {
     engine.setFilter({
       mode: filterMode.value,
@@ -57,48 +57,45 @@ export function useSynthUI(opts: SynthUIOptions): SynthUI {
     })
   }
 
-  // APPLY ENVELOPE TO ENGINE
-  const bindEnvelope = () => {
-    // You already have envelope inside voices,
-    // so this would update your engine config or re-init voices.
-    // For now, we expose the values for your engine to consume.
-  }
-
-  // CREATE LFO ROUTE
   const createLfoRoute = (target: AudioParam) => {
     const lfo = engine.addLfo({
       frequency: lfoFreq.value,
       depth: lfoDepth.value,
     })
-
     engine.addLfoRoute(lfo, target)
   }
 
-  // PATCH SAVE/LOAD
-  const savePatch = () => ({
-    filterMode: filterMode.value,
-    filterFreq: filterFreq.value,
-    filterQ: filterQ.value,
-    attack: attack.value,
-    decay: decay.value,
-    sustain: sustain.value,
-    release: release.value,
-    lfoFreq: lfoFreq.value,
-    lfoDepth: lfoDepth.value,
-  })
+  const savePatch = (name: string) => {
+    storage.savePatch(name, {
+      filterMode: filterMode.value,
+      filterFreq: filterFreq.value,
+      filterQ: filterQ.value,
+      attack: attack.value,
+      decay: decay.value,
+      sustain: sustain.value,
+      release: release.value,
+      lfoFreq: lfoFreq.value,
+      lfoDepth: lfoDepth.value,
+    })
+  }
 
-  const loadPatch = (patch: Record<string, number | string>) => {
-    if ('filterMode' in patch) filterMode.value = patch.filterMode as BiquadFilterType
-    if ('filterFreq' in patch) filterFreq.value = Number(patch.filterFreq)
-    if ('filterQ' in patch) filterQ.value = Number(patch.filterQ)
+  const loadPatch = (name: string) => {
+    const patch = storage.loadPatch(name)
+    if (!patch) return
 
-    if ('attack' in patch) attack.value = Number(patch.attack)
-    if ('decay' in patch) decay.value = Number(patch.decay)
-    if ('sustain' in patch) sustain.value = Number(patch.sustain)
-    if ('release' in patch) release.value = Number(patch.release)
+    const d = patch.data
 
-    if ('lfoFreq' in patch) lfoFreq.value = Number(patch.lfoFreq)
-    if ('lfoDepth' in patch) lfoDepth.value = Number(patch.lfoDepth)
+    if ('filterMode' in d) filterMode.value = d.filterMode as BiquadFilterType
+    if ('filterFreq' in d) filterFreq.value = Number(d.filterFreq)
+    if ('filterQ' in d) filterQ.value = Number(d.filterQ)
+
+    if ('attack' in d) attack.value = Number(d.attack)
+    if ('decay' in d) decay.value = Number(d.decay)
+    if ('sustain' in d) sustain.value = Number(d.sustain)
+    if ('release' in d) release.value = Number(d.release)
+
+    if ('lfoFreq' in d) lfoFreq.value = Number(d.lfoFreq)
+    if ('lfoDepth' in d) lfoDepth.value = Number(d.lfoDepth)
 
     bindFilter()
   }
@@ -114,7 +111,6 @@ export function useSynthUI(opts: SynthUIOptions): SynthUI {
     lfoFreq,
     lfoDepth,
     bindFilter,
-    bindEnvelope,
     createLfoRoute,
     savePatch,
     loadPatch,
