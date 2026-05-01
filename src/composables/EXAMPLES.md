@@ -838,3 +838,92 @@ function sendRemote() {
   </div>
 </template>
 ```
+
+### useAudio
+
+```
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useAudio } from './useAudio';
+
+const src = ref('https://example.com/audio.mp3');
+
+const {
+  playing,
+  currentTime,
+  duration,
+  canPlay,
+  play,
+  pause,
+  toggle,
+  setTime,
+  setVolume,
+} = useAudio(src.value, {
+  autoplay: false,
+  loop: false,
+  volume: 0.8,
+});
+</script>
+
+<template>
+  <div>
+    <button :disabled="!canPlay" @click="toggle">
+      {{ playing ? 'Pause' : 'Play' }}
+    </button>
+
+    <div>
+      {{ Math.floor(currentTime) }} / {{ Math.floor(duration) }} s
+    </div>
+
+    <input
+      type="range"
+      min="0"
+      :max="duration || 0"
+      :value="currentTime"
+      @input="setTime(Number(($event.target as HTMLInputElement).value))"
+    />
+
+    <input
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      @input="setVolume(Number(($event.target as HTMLInputElement).value))"
+    />
+  </div>
+</template>
+```
+
+### useSynth
+
+```
+// Example usage in a component
+<script setup lang="ts">
+import { usePolySynth, useStepSequencer } from './composables/useSynth';
+
+const synth = usePolySynth({
+  waveform: 'sawtooth',
+  envelope: { attack: 0.01, decay: 0.2, sustain: 0.7, release: 0.3 },
+  filterFrequency: 800,
+  filterQ: 1.2,
+});
+
+const seq = useStepSequencer({
+  bpm: 120,
+  steps: [
+    { note: 60, velocity: 1 },
+    { note: null, velocity: 0 },
+    { note: 67, velocity: 1 },
+    { note: null, velocity: 0 },
+  ],
+});
+
+seq.onStep((step) => {
+  if (step.note !== null) synth.noteOn(step.note);
+  else synth.noteOff(step.note ?? 0);
+});
+
+const start = () => seq.start();
+const stop = () => seq.stop();
+</script>
+```
