@@ -1,6 +1,17 @@
 // openapi-rest-client-generator.ts
 import type { OpenAPIV3 } from 'openapi-types'
 
+type SchemaOrRef = OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject
+type ParameterOrRef = OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject
+
+function isSchemaRef(schema: SchemaOrRef): schema is OpenAPIV3.ReferenceObject {
+  return '$ref' in schema
+}
+
+function isParamRef(param: ParameterOrRef): param is OpenAPIV3.ReferenceObject {
+  return '$ref' in param
+}
+
 export class OpenApiRestClientGenerator {
   constructor(private readonly spec: OpenAPIV3.Document) {}
 
@@ -34,17 +45,21 @@ import { useRestClient } from "@/composables/useRestClient";
     const schemas = this.spec.components?.schemas ?? {}
 
     for (const [name, schema] of Object.entries(schemas)) {
-      out.push(this.schemaToTs(name, schema as OpenAPIV3.SchemaObject))
+      out.push(this.schemaToTs(name, schema as SchemaOrRef))
     }
 
     return out.join('\n\n')
   }
 
-  private schemaToTs(name: string, schema: OpenAPIV3.SchemaObject): string {
+  private schemaToTs(name: string, schema: SchemaOrRef): string {
+    if (isSchemaRef(schema)) {
+      return `export type ${name} = ${this.refToTs(schema.$ref)}`
+    }
+
     if (schema.type === 'object' && schema.properties) {
       const fields = Object.entries(schema.properties)
         .map(([key, prop]) => {
-          const p = prop as OpenAPIV3.SchemaObject
+          const p = prop as SchemaOrRef
           return `  ${key}${this.optional(schema, key)}: ${this.resolveType(p)};`
         })
         .join('\n')
@@ -60,8 +75,8 @@ import { useRestClient } from "@/composables/useRestClient";
     return schema.required?.includes(key) ? '' : '?'
   }
 
-  private resolveType(schema: OpenAPIV3.SchemaObject): string {
-    if (schema.$ref) {
+  private resolveType(schema: SchemaOrRef): string {
+    if (isSchemaRef(schema)) {
       return this.refToTs(schema.$ref)
     }
 
@@ -73,14 +88,17 @@ import { useRestClient } from "@/composables/useRestClient";
         return 'number'
       case 'boolean':
         return 'boolean'
-      case 'array':
-        return `${this.resolveType(schema.items as OpenAPIV3.SchemaObject)}[]`
+      case 'array': {
+        const items = schema.items as SchemaOrRef | undefined
+        if (!items) return 'any[]'
+        return `${this.resolveType(items)}[]`
+      }
       case 'object':
         if (schema.properties) {
           return (
             '{ ' +
             Object.entries(schema.properties)
-              .map(([k, v]) => `${k}: ${this.resolveType(v as OpenAPIV3.SchemaObject)}`)
+              .map(([k, v]) => `${k}: ${this.resolveType(v as SchemaOrRef)}`)
               .join('; ') +
             ' }'
           )
@@ -139,7 +157,13 @@ ${methods.join('\n')}
     return `
   async ${name}(args: {
     ${params.pathParams.map((p) => `${p.name}: string | number`).join('\n    ')}
-    ${params.queryParams.length ? `query?: { ${params.queryParams.map((p) => `${p.name}?: string | number | boolean`).join('; ')} }` : ''}
+    ${
+      params.queryParams.length
+        ? `query?: { ${params.queryParams
+            .map((p) => `${p.name}?: string | number | boolean`)
+            .join('; ')} }`
+        : ''
+    }
     ${bodyType ? `body?: ${bodyType}` : ''}
   }): Promise<${responseType}> {
     return this.rest.${method}<${responseType}${bodyType ? `, ${bodyType}` : ''}>(
@@ -169,7 +193,8 @@ ${methods.join('\n')}
     const pathParams: { name: string }[] = []
     const queryParams: { name: string }[] = []
 
-    for (const p of params) {
+    for (const p of params as ParameterOrRef[]) {
+      if (isParamRef(p)) continue
       const param = p as OpenAPIV3.ParameterObject
       if (param.in === 'path') pathParams.push({ name: param.name })
       if (param.in === 'query') queryParams.push({ name: param.name })
@@ -189,9 +214,9 @@ ${methods.join('\n')}
 
     if (!content) return 'void'
 
-    const schema = content.schema as OpenAPIV3.SchemaObject
+    const schema = content.schema as SchemaOrRef
 
-    if (schema.$ref) return this.refToTs(schema.$ref)
+    if (isSchemaRef(schema)) return this.refToTs(schema.$ref)
 
     return this.resolveType(schema)
   }
@@ -203,9 +228,9 @@ ${methods.join('\n')}
     const json = body.content?.['application/json']
     if (!json) return null
 
-    const schema = json.schema as OpenAPIV3.SchemaObject
+    const schema = json.schema as SchemaOrRef
 
-    if (schema.$ref) return this.refToTs(schema.$ref)
+    if (isSchemaRef(schema)) return this.refToTs(schema.$ref)
 
     return this.resolveType(schema)
   }

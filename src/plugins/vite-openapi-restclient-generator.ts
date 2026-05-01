@@ -1,4 +1,4 @@
-// vite-plugin-openapi-rest-client.ts
+// src/plugins/vite-openapi-restclient-generator.ts
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import YAML from 'yaml'
@@ -15,8 +15,23 @@ export function openApiRestClientPlugin(options: OpenApiPluginOptions): Plugin {
   const isRemote = options.source.startsWith('http://') || options.source.startsWith('https://')
 
   const outputPath = path.resolve(options.output)
-
   let isDev = false
+
+  // ------------------------------------------------------------
+  // FIX: generateClient is now a closure function, not this.*
+  // ------------------------------------------------------------
+  const generateClient = async () => {
+    if (!isDev) return
+
+    const spec = await loadOpenApi(options.source)
+    const generator = new OpenApiRestClientGenerator(spec)
+    const code = generator.generate()
+
+    await fs.mkdir(path.dirname(outputPath), { recursive: true })
+    await fs.writeFile(outputPath, code, 'utf8')
+
+    console.log(`[openapi] generated client → ${options.output}`)
+  }
 
   return {
     name: 'vite-plugin-openapi-rest-client',
@@ -26,9 +41,9 @@ export function openApiRestClientPlugin(options: OpenApiPluginOptions): Plugin {
     },
 
     async buildStart() {
-      if (!isDev) return // ⛔ skip in build mode
+      if (!isDev) return
 
-      await this.generateClient()
+      await generateClient()
 
       if (!isRemote) {
         this.addWatchFile(path.resolve(options.source))
@@ -39,21 +54,8 @@ export function openApiRestClientPlugin(options: OpenApiPluginOptions): Plugin {
       if (!isDev) return
 
       if (!isRemote && ctx.file.endsWith(options.source)) {
-        await this.generateClient()
+        await generateClient()
       }
-    },
-
-    async generateClient() {
-      if (!isDev) return
-
-      const spec = await loadOpenApi(options.source)
-      const generator = new OpenApiRestClientGenerator(spec)
-      const code = generator.generate()
-
-      await fs.mkdir(path.dirname(outputPath), { recursive: true })
-      await fs.writeFile(outputPath, code, 'utf8')
-
-      console.log(`[openapi] generated client → ${options.output}`)
     },
   }
 }
